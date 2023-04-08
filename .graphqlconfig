@@ -1,0 +1,12 @@
+{
+  "name": "Agora Schema",
+  "schemaPath": "remote.graphql",
+  "extensions": {
+    "endpoints": {
+      "Eternia Endpoint": {
+        "url": "http://localhost:4000/graphql",
+        "introspect": true
+      }
+    }
+  }
+}
