@@ -1,8 +1,9 @@
 import {LoaderFunctionArgs} from "@remix-run/router";
 import {useLoaderData} from "@remix-run/react";
-import {ICategory, ICategoryInfo, useClient} from "~/utils/graphql";
+import {ICategory, ICategoryInfo, IProduct, useClient} from "~/utils/graphql";
 import {json, redirect} from "@remix-run/node";
 import {ItemCard} from "~/components/ItemCard";
+import {useState} from "react";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const client = useClient(request)
@@ -18,8 +19,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function Category() {
     const { category } = useLoaderData() as { category: ICategoryInfo }
+    const [sort, setSort] = useState<(a: IProduct, b: IProduct) => number>()
+    const [currentRange, setRange] = useState<number>()
+    const [priceMin, setPriceMin] = useState<number>()
+    const [priceMax, setPriceMax] = useState<number>()
 
-    console.log(category)
+    const ranges = [
+        [0, 10],
+        [10, 25],
+        [25, 50],
+        [50, undefined]
+    ]
+
+    let products = category.products
+        .filter(p => priceMin === undefined || parseFloat(p.price.price) >= priceMin)
+        .filter(p => priceMax === undefined || parseFloat(p.price.price) <= priceMax)
+
+    if (sort) {
+        products = products.sort(sort)
+    }
 
     return (
         <div className={"flex flex-col flex-1 text-white"}>
@@ -30,7 +48,7 @@ export default function Category() {
                 </div>
             </div>
             <div className={"flex flex-row flex-1 gap-20"}>
-                <div className={"flex flex-col w-60 gap-2"}>
+                <div className={"flex flex-col w-60 gap-4"}>
                     <div className={"flex flex-row justify-between"}>
                         <span>Sort by</span>
                         <select className={"bg-transparent border-b border-white"}>
@@ -39,12 +57,31 @@ export default function Category() {
                             <option>Name</option>
                         </select>
                     </div>
-                    <h3 className={"text-lg"}>Filters</h3>
-
+                    <div className={"flex flex-col w-60 gap-2"}>
+                        <h3 className={"text-lg"}>Price Range</h3>
+                        {ranges.map((range, i) => (
+                            <button
+                                className={`text-left hover:text-primary ${i === currentRange ? 'text-primary' : ''}`}
+                                onClick={() => {
+                                    if (currentRange == i) {
+                                        setPriceMin(undefined)
+                                        setPriceMax(undefined)
+                                        setRange(undefined)
+                                    } else {
+                                        setPriceMin(range[0])
+                                        setPriceMax(range[1])
+                                        setRange(i)
+                                    }
+                                }}
+                            >
+                                {range[1] ? `$${range[0]} to $${range[1]}` : `$${range[0]}+`}
+                            </button>
+                        ))}
+                    </div>
                 </div>
                 <div className={"flex flex-col flex-3"}>
                     <div className={"flex flex-row flex-1 flex-wrap gap-2"}>
-                        {category.products.map(product => (
+                        {products.map(product => (
                             <ItemCard product={product} />
                         ))}
                     </div>
