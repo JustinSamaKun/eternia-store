@@ -9,7 +9,7 @@ export interface ICartContext {
     updateCart: (id: ICart | null) => void;
 }
 
-export const CartContext = React.createContext<ICartContext | null>(null);
+export const CartContext = React.createContext<ICartContext>({ cart: null, cartOpen: false, updateCart: id => {}, updateCartOpen: open => {} });
 
 const CartProvider = ({ children, initialCart }: any) => {
     const [cartOpen, setCartOpen] = React.useState<boolean>(false);

@@ -6,16 +6,8 @@ import {LoaderFunctionArgs} from "@remix-run/router";
 import {useLoaderData} from "@remix-run/react";
 import {json} from "@remix-run/node";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-    const client = useClient(request)
 
-    return json({
-        featured: await client.fetchProductsByTag('slideshow')
-    })
-}
-
-export const Slider = () => {
-    const { featured } = useLoaderData()
+export const Slider = ({ featured }: { featured: IProductInfo[] }) => {
 
     const [page, setPage] = useState<number>(0);
     const [isHovered, setIsHovered] = useState<boolean>(false);

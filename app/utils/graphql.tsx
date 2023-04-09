@@ -4,11 +4,13 @@ import {
     Client,
     createClient,
     DocumentInput,
+    fetchExchange,
     OperationContext,
     OperationResult,
 } from "urql";
-import {useRouteLoaderData} from "react-router";
 import {getStoreId} from "~/utils/requests.server";
+import useShop from "~/hooks/useShop";
+import {useLocation} from "react-router";
 
 export function useClient(request?: Request) {
     let store: string, url: string;
@@ -16,37 +18,45 @@ export function useClient(request?: Request) {
         store = getStoreId(request)
         url = 'http://localhost:4000/graphql';
     } else {
-        const data: any = useRouteLoaderData('index');
-        store = data.store;
-        url = 'https://admin.agoramp.com/graphql';
+        const shop = useShop();
+        store = shop.id;
+        url = 'http://localhost:4000/graphql';
     }
 
     return new GraphQLClient(createClient({
         url,
         requestPolicy: 'network-only',
-        fetchOptions: {
-            headers: {
-                'X-Agora-Store-Id': store
-            },
-            cache: 'no-cache'
-        },
-        exchanges: []
-    }))
+        exchanges: [fetchExchange]
+    }), store)
 }
 
 export class GraphQLClient {
     private client: Client;
+    private shop: string;
 
-    constructor(client: Client) {
+    constructor(client: Client, shop: string) {
         this.client = client;
+        this.shop = shop;
     }
 
     private async query<Data = any, Variables extends AnyVariables = AnyVariables>(query: DocumentInput<Data, Variables>, variables?: Variables) {
-        return this.client.query<Data, Variables>(query, variables ?? ({} as any));
+        return this.client.query<Data, Variables>(query, variables ?? ({} as any), {
+            fetchOptions: {
+                headers: {
+                    'X-Agora-Store-Id': this.shop
+                }
+            }
+        });
     }
 
     private async mutation<Data = any, Variables extends AnyVariables = AnyVariables>(query: DocumentInput<Data, Variables>, variables?: Variables) {
-        return this.client.mutation<Data, Variables>(query, variables ?? ({} as any));
+        return this.client.mutation<Data, Variables>(query, variables ?? ({} as any), {
+            fetchOptions: {
+                headers: {
+                    'X-Agora-Store-Id': this.shop
+                }
+            }
+        });
     }
 
     public async fetchShop() {
@@ -414,6 +424,14 @@ export interface ICategory {
     handle: string;
     order: number;
     subcategories: ICategory[];
+}
+
+export interface ICategoryInfo {
+    handle: string;
+    title: string;
+    description: string;
+    displayType: string;
+    products: IProduct[];
 }
 
 export interface IProduct {

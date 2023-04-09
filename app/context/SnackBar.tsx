@@ -16,7 +16,7 @@ export interface ISnackBarContext {
     addMessage: (type: MessageType, message: string) => void;
 }
 
-export const SnackBarContext = React.createContext<ISnackBarContext | null>(null);
+export const SnackBarContext = React.createContext<ISnackBarContext>({ snackBar: [], addMessage: (type, message) => {}});
 
 const SnackBarProvider = ({ children }: any) => {
     const [snackBar, setSnackBar] = React.useState<ISnackBarMessage[]>([]);

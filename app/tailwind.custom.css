@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        overflow-x: hidden;
+        @apply font-poppins;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #242132;
+    }
+}
+
+@layer utilities {
+
+    .button-hover{
+        transition: all .15s ease 0s;
+        box-shadow: 0 5px 10px rgba(0,0,0,.1);
+    }
+
+    .button-hover:hover {
+        transform: translateY(-1.5px);
+    }
+
+    .radial-background {
+        background: radial-gradient(50% 50% at 50% 50%, #403A62 0%, rgba(36, 33, 50, 0) 100%);
+    }
+
+    .background-clip {
+        -webkit-background-clip: text;
+    }
+
+    .border-color {
+        border-image: linear-gradient(153.95deg, #AC88FF 2.05%, #8D87FF 95.95%);
+    }
+
+    .button-background {
+        background: linear-gradient(272.19deg, #AD88FF 11.44%, #8D87FF 98.7%);
+    }
+
+    .title {
+        -webkit-text-fill-color: transparent;
+        background-image: linear-gradient(90deg,#E0E5FE 0,#B189FF);
+        -webkit-background-clip: text;
+        cursor: auto;
+    }
+
+    .slideshow {
+        height: 32vw;
+        position: relative;
+    }
+
+    .content {
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        color: white;
+        height: 24vw;
+        margin-left: 25vw;
+        margin-right: 25vw;
+        transition: left 400ms ease-in-out;
+        left: 0;
+    }
+
+    .buttons {
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        width: 5vw;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .details {
+        margin-top: 3vw;
+        width: 31vw;
+    }
+
+    .image-holder {
+        top: -1.5vw;
+        left: 25vw;
+        position: absolute;
+        width: 30vw;
+    }
+
+    .image {
+        width: 25vw;
+    }
+
+    .before {
+        left: -100vw;
+    }
+
+    .after {
+        left: 100vw;
+    }
+}

@@ -1,7 +1,8 @@
 import {Shop} from "~/utils/graphql";
-import {useRouteLoaderData} from "react-router";
+import {useContext} from "react";
+import {ShopContext} from "~/context/ShopContext";
 
 export default function useShop(): Shop {
-    const { shop } = useRouteLoaderData('index') as any;
+    const { shop } = useContext(ShopContext);
     return shop
 }

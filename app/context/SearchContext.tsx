@@ -1,30 +1,30 @@
 import React from "react";
-import { IFeatureItem } from "../components/ItemsFeature/components/Card/types";
+import {IProduct} from "~/utils/graphql";
 
 export interface ISearchContext {
-    items: Set<IFeatureItem>;
+    items: Set<IProduct>;
     openSearch: boolean;
     openSearchModal: (set: boolean) => void;
-    updateItems: (item: IFeatureItem) => void;
-    searchItems: (query: string) => IFeatureItem[];
+    updateItems: (item: IProduct) => void;
+    searchItems: (query: string) => IProduct[];
 }
 
 export const SearchContext = React.createContext<ISearchContext | null>(null)
 
 const SearchProvider = ({ children }: any) => {
-    const [items, setItems] = React.useState<Set<IFeatureItem>>(new Set());
+    const [items, setItems] = React.useState<Set<IProduct>>(new Set());
     const [openSearch, setOpenSearch] = React.useState<boolean>(false);
 
-    const updateItems = (item: IFeatureItem) => {
+    const updateItems = (item: IProduct) => {
         setItems(new Set(items.add(item)));
     }
 
-    const searchItems = (query: string): IFeatureItem[] => {
+    const searchItems = (query: string): IProduct[] => {
         console.log(items)
         if (query === "") {
             return [];
         }
-        return Array.from(items).filter((item: IFeatureItem) => item.handle.includes(query));
+        return Array.from(items).filter((item: IProduct) => item.handle.includes(query));
     }
 
     const openSearchModal = (set: boolean) => {

@@ -31,31 +31,26 @@ export const Navigation = (props: INavigationProps) => {
 
     return (
         <div>
-            <header className="pr-5 py-3 md:py-9 flex justify-between items-center text-white">
+            <header className="pr-5 py-3 md:py-9 flex flex-row justify-between items-center text-white">
                 <Link x-comp="NavLink" aria-label="Remix" aria-current="page" className="active" to="/">
                     <img
                         className="object-contain fadeIn invisible md:visible h-20 w-48"
                         src={shop?.branding?.logo}
                         alt="logo"
                     />
-                    <img
-                        className="object-contain fadeIn visible md:invisible h-[90px] w-[90px] pl-0 -mt-[55px] md:mt-0 md:absolute"
-                        src={shop?.branding?.icon}
-                        alt="icon"
-                    />
                 </Link>
-                <nav className="flex fadeIn" aria-label="Main">
+                <div className="flex fadeIn" aria-label="Main">
                     <Link x-comp="HeaderLink" to={"/"} className="text-d-p-sm mx-2 sm:mx-4 text-[16px] md:text-lg last:mr-0 hover:opacity-100 font-bold text-custom-gray-600 hover:text-custom-gray-200 hover:cursor-pointer">Home</Link>
                     {shop?.categories?.sort((a, b) => a.order > b.order ? 1 : -1).map((category: ICategory) => {
                         return (
-                            <a x-comp="HeaderLink" href={`#${category.handle}`} className="text-d-p-sm mx-2 sm:mx-4 text-[16px] md:text-lg last:mr-0 text-custom-gray-600 hover:text-custom-gray-200 font-bold hover:cursor-pointer">{category.title}</a>
+                            <a key={category.id} x-comp="HeaderLink" href={`/category/${category.handle}`} className="text-d-p-sm mx-2 sm:mx-4 text-[16px] md:text-lg last:mr-0 text-custom-gray-600 hover:text-custom-gray-200 font-bold hover:cursor-pointer">{category.title}</a>
                         )
                     })}
-                </nav>
+                </div>
                 <div className="float-right flex flex-row">
                     <a className="cursor-pointer mr-6" onClick={() => openSearchModal(true)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                         </svg>
                     </a>
                     <a className="cursor-pointer mr-5" onClick={handleCartClick}>

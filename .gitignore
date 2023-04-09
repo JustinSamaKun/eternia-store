@@ -8,3 +8,4 @@ node_modules
 /remote.graphql
 /package-lock.json
 /webstore.iml
+/app/tailwind.css

@@ -8,5 +8,5 @@ export const cartCookie = createCookie("agora-cart-id", {
 });
 
 export function getStoreId(request: Request) {
-    return request.headers.get("X-Agora-Store-Id") ?? ''
+    return request.headers.get("X-Agora-Store-Id") ?? 'AAABhUtFyNCsaqQL'
 }
