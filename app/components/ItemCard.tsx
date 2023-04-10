@@ -8,7 +8,7 @@ export const ItemCard = ({ product }: { product: IProduct }) => {
     const [viewDetails, setViewDetails] = useState<boolean>(false);
 
     return (
-        <div className="flex flex-col px-7 py-5 relative bg-card-background-500 rounded-2xl border-4 border-custom-purple-600 h-[21rem] max-w-[15rem]">
+        <div className="flex flex-col h-[24rem] w-[16rem] p-8 relative bg-card-background-500 rounded-2xl border-4 border-custom-purple-600">
             <div className="absolute text-sm left-0 top-0 -ml-1 -mt-1 py-2 px-4 bg-custom-purple-600 rounded-br-2xl rounded-tl-2xl text-custom-gray-100 text-opacity-90 font-black">
                 {(price.price === '0.00') ? "Free" : `$${price.price}`}
             </div>
@@ -18,11 +18,11 @@ export const ItemCard = ({ product }: { product: IProduct }) => {
                 </svg>
             </a>
             <img
-                className="object-contain h-48 w-40"
+                className="object-contain max-w-full my-auto"
                 src={image}
                 alt={title}
             />
-            <div className={"flex flex-col gap-2 justify-self-end"}>
+            <div className={"flex flex-col gap-2 mt-auto"}>
                 <h3 className="font-black opacity-70 text-custom-gray-100 w-100 text-md text-center">{title}</h3>
                 <AddToCart
                     card={true}
@@ -30,12 +30,6 @@ export const ItemCard = ({ product }: { product: IProduct }) => {
                     quantity={1}
                 />
             </div>
-            <ItemDetails
-                productId={id}
-                handle={handle}
-                viewDetails={viewDetails}
-                setViewDetails={setViewDetails}
-            />
         </div>
     )
 }

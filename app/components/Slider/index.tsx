@@ -2,30 +2,30 @@ import { useState, useEffect } from "react";
 import { Feature } from "./components/Feature";
 
 import {IProductInfo, useClient} from "~/utils/graphql";
-import {LoaderFunctionArgs} from "@remix-run/router";
-import {useLoaderData} from "@remix-run/react";
-import {json} from "@remix-run/node";
 
 
 export const Slider = ({ featured }: { featured: IProductInfo[] }) => {
 
     const [page, setPage] = useState<number>(0);
+    const [timer, setTimer] = useState<NodeJS.Timeout>();
     const [isHovered, setIsHovered] = useState<boolean>(false);
 
     useEffect(() => {
-        const timer = setInterval(() => handlePageChange(page + 1), 5000);
+        if (timer) clearTimeout(timer);
+
+        setTimer(setTimeout(() => handlePageChange(page + 1), 5000));
 
         return () => {
-            clearInterval(timer);
+            clearTimeout(timer);
         }
-    }, []);
+    }, [page]);
     const handlePageChange = (page: number) => setPage((page + featured.length) % featured.length);
 
     return (
         <section className="slideshow">
             {featured.map((feature: IProductInfo, i: number) => {
                     return (
-                        <div className={"content" + (i < page ? " before" : i > page ? " after" : "")}>
+                        <div className={"content w-full" + (i < page ? " before" : i > page ? " after" : "")}>
                             <Feature
                                 {...feature}
                             />

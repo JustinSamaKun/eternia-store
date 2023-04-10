@@ -58,8 +58,6 @@
         flex-direction: row;
         color: white;
         height: 24vw;
-        margin-left: 25vw;
-        margin-right: 25vw;
         transition: left 400ms ease-in-out;
         left: 0;
     }
@@ -72,11 +70,6 @@
         left: 0;
         right: 0;
         bottom: 0;
-    }
-
-    .details {
-        margin-top: 3vw;
-        width: 31vw;
     }
 
     .image-holder {

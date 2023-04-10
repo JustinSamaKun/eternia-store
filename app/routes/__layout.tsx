@@ -26,7 +26,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return json({ shop, cart })
 }
 
-export default function __index() {
+export default function __layout() {
     const {shop, cart} = useLoaderData()
     const {snackBar} = useContext(SnackBarContext) as ISnackBarContext;
     const [login, setLogin] = useState(false)
