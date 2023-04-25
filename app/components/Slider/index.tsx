@@ -25,7 +25,7 @@ export const Slider = ({ featured }: { featured: IProductInfo[] }) => {
         <section className="slideshow">
             {featured.map((feature: IProductInfo, i: number) => {
                     return (
-                        <div className={"content w-full" + (i < page ? " before" : i > page ? " after" : "")}>
+                        <div key={i} className={"content w-full" + (i < page ? " before" : i > page ? " after" : "")}>
                             <Feature
                                 {...feature}
                             />
