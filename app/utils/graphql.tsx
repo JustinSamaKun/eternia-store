@@ -69,8 +69,8 @@ export class GraphQLClient {
         return result.data.shop;
     }
 
-    public async fetchPopularItems() {
-        const result = await this.query<PopularItemsResult>(POPULAR_ITEMS);
+    public async fetchPopularItems(amount?: number, user?: string, cart?: string) {
+        const result = await this.query<PopularItemsResult>(POPULAR_ITEMS, { amount, user, cart });
 
         if (result.error || !result.data) {
             return Promise.reject(result.error || new Error("No data received."));
@@ -173,6 +173,18 @@ export class GraphQLClient {
         return result.data.cartCreate;
     }
 
+    public async createCheckout(cart: string, ip: string, country: string, returnURL?: string) {
+        // TODO: checkout create
+        const mutation = CART_CREATE;
+        const result = await this.mutation<CartCreateResult>(mutation, { cart, ip, country, returnURL });
+
+        if (result.error || !result.data) {
+            return Promise.reject(result.error || new Error("No data received."));
+        }
+
+        return result.data.cartCreate;
+    }
+
     public async removeCartLine(cartId: string, productId: string, quantity: number) {
         const mutation = CART_LINE_REMOVE;
         const variables = { cartId, productId, quantity };
@@ -225,8 +237,8 @@ const SHOP_QUERY = gql`
 `
 
 const POPULAR_ITEMS = gql`
-    query {
-        topProducts {
+    query TopProducts($amount: Int, $user: String, $cart: String) {
+        topProducts(amount: $amount, user: $user, cart: $cart) {
             id
             handle
             title
@@ -412,6 +424,15 @@ const CART_LINE_UPDATE = gql`
     }
 `
 
+const USER_QUERY = gql`
+    query User($user: String!) {
+        user(user: $user) {
+            id
+            name
+        }
+    }
+`
+
 // Globally usable types
 export interface IBranding {
     logo: string;
@@ -473,6 +494,7 @@ export interface ICart {
     id: string
     identity: IIdentity;
     cost: ICost;
+    currency: string;
     discounts: string[];
     items: ICartItem[];
 }
@@ -527,11 +549,18 @@ interface ProductsByCategoryQueryResult {
     };
 }
 
-// TypeScript interfaces for mutation results
+interface UserQueryResult {
+    user: {
+        id: string
+        name: string
+    };
+}
 
 interface CartQueryResult {
     cart: ICart;
 }
+
+// TypeScript interfaces for mutation results
 
 interface CartLineAddResult {
     cartLineAdd: ICart;

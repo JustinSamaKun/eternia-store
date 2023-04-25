@@ -5,29 +5,6 @@ import { useMutation } from "urql";
 import { LoginContext, ILoginContext } from "../../context/LoginContext";
 import {useClient} from "~/utils/graphql";
 
-export interface IUser {
-    username: string;
-    id: string;
-}
-
-export function getUserFromName(username: string): Promise<[string | undefined, string | undefined]> {
-    return fetch(
-        `https://playerdb.co/api/player/minecraft/${username}`,
-        {
-            mode: "cors"
-        })
-        .then(out => out.json())
-        .catch(e => { return {} as any })
-        .then(res => {
-            const id = res?.data?.player?.id
-            const name = res?.data?.player?.username
-            if (id && name && name.toLowerCase() === username.toLowerCase()) {
-                return [name, id];
-            }
-            return [undefined, undefined];
-        });
-}
-
 export const Login = () => {
     const { cartID, cart, updateCart } = useContext(CartContext) as ICartContext;
     const { showLogIn, setShowLogIn } = useContext(LoginContext) as ILoginContext;
@@ -45,8 +22,7 @@ export const Login = () => {
         }
         setLoading(true);
 
-        const user = getUserFromName(input);
-        user.then(([name, id]) => {
+        client.fetchUser(input).then(({name, id}) => {
             if (name === undefined || id === undefined) {
                 setLoginError("Please enter a valid username.");
                 return;
@@ -58,10 +34,13 @@ export const Login = () => {
         });
     };
 
+    if (!showLogIn) return <></>
+
     return (
-        <section className="relative w-full h-full mx-auto max-w-2xl flex justify-center items-center">
-            <div className="bg-white rounded-xl p-14">
-                <h1>Login</h1>
+        <section className={"fixed top-0 right-0 left-0 bottom-0 flex justify-center items-center"}>
+            <div className={"absolute top-0 right-0 left-0 bottom-0 blur-lg"}/>
+            <div className={"w-[40rem] p-14 rounded-lg border-gray-500 bg-gray-800 text-customn-white-200"}>
+                <h1>Please login to continue</h1>
                 <input
                     className=""
                     placeholder="Enter your username"

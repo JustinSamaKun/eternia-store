@@ -3,7 +3,7 @@ import {Alert, Cart, Login, Navigation, Search} from '~/components';
 import { SnackBarContext, ISnackBarMessage, ISnackBarContext } from '~/context/SnackBar';
 import {Outlet, useLoaderData} from "@remix-run/react";
 import React, {useContext, useState} from "react";
-import {cartCookie} from "~/utils/requests.server";
+import {cartCookie, getCartId} from "~/utils/requests.server";
 import {useClient} from "~/utils/graphql";
 import {json} from "@remix-run/node";
 import {Modal} from "~/components/Modal";
@@ -13,7 +13,7 @@ import SearchProvider from "~/context/SearchContext";
 import LoginProvider from "~/context/LoginContext";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    const cartId = await cartCookie.parse(request.headers.get("Cookie"))
+    const cartId = await getCartId(request)
     const client = useClient(request)
 
     const [shop, cart] = await Promise.all([

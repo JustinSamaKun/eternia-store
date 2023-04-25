@@ -20,7 +20,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function Category() {
     const { category } = useLoaderData() as { category: ICategoryInfo }
     const [sort, setSort] = useState<(a: IProduct, b: IProduct) => number>()
-    const [currentRange, setRange] = useState<number>()
+    const [selectedRanges, setSelected] = useState<number[]>([])
     const [priceMin, setPriceMin] = useState<number>()
     const [priceMax, setPriceMax] = useState<number>()
 
@@ -61,17 +61,15 @@ export default function Category() {
                         <h3 className={"text-lg"}>Price Range</h3>
                         {ranges.map((range, i) => (
                             <button
-                                className={`text-left hover:text-primary ${i === currentRange ? 'text-primary' : ''}`}
+                                className={`text-left hover:text-primary ${selectedRanges.includes(i) ? 'text-primary' : ''}`}
                                 onClick={() => {
-                                    if (currentRange == i) {
-                                        setPriceMin(undefined)
-                                        setPriceMax(undefined)
-                                        setRange(undefined)
+                                    if (selectedRanges.includes(i)) {
+                                        setSelected(selectedRanges.filter(j => j !== i))
                                     } else {
-                                        setPriceMin(range[0])
-                                        setPriceMax(range[1])
-                                        setRange(i)
+                                        setSelected([...selectedRanges, i])
                                     }
+                                    setPriceMin(selectedRanges.map(r => ranges[r][0]).reduce((a, b) => !a || !b ? undefined : Math.min(a, b)))
+                                    setPriceMax(selectedRanges.map(r => ranges[r][1]).reduce((a, b) => !a || !b ? undefined : Math.max(a, b)))
                                 }}
                             >
                                 {range[1] ? `$${range[0]} to $${range[1]}` : `$${range[0]}+`}
