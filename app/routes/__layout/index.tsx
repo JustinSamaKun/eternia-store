@@ -1,6 +1,6 @@
 import {Cart, Search, Slider} from "~/components";
-import React from "react";
-import {useLoaderData} from "@remix-run/react";
+import React, {useContext, useEffect, useRef, useState} from "react";
+import {useLoaderData, useNavigate} from "@remix-run/react";
 import {LoaderFunctionArgs} from "@remix-run/router";
 import {IProduct, useClient} from "~/utils/graphql";
 import useShop from "~/hooks/useShop";
@@ -8,6 +8,7 @@ import {Link} from "react-router-dom";
 import {cli} from "@remix-run/dev";
 import {ItemCard} from "~/components/ItemCard";
 import {getCartId} from "~/utils/requests.server";
+import {CartContext} from "~/context/CartContext";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const client = useClient(request)
@@ -25,6 +26,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function homepage() {
     const {featured, top, favorites} = useLoaderData()
     const shop = useShop()
+    const { cart } = useContext(CartContext)
+    const navigate = useNavigate()
+    const count = useRef(0)
+
+    useEffect(() => {
+        if (count.current < 2) {
+            count.current++;
+            return
+        }
+        navigate('.', { replace: true })
+    }, [cart?.identity.uuid])
 
     return (
         <>
