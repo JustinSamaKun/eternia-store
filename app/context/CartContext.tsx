@@ -1,5 +1,6 @@
 import React from "react";
 import {ICart} from "~/utils/graphql";
+import Cookies from 'js-cookie'
 
 export interface ICartContext {
     cartID?: string;
@@ -21,11 +22,9 @@ const CartProvider = ({ children, initialCart }: any) => {
 
     const updateCart = (next: ICart | null) => {
         if (next != null) {
-            if (next.id !== cart?.id) {
-
-            }
+            Cookies.set("cart", next.id)
         } else {
-            localStorage.removeItem("cart");
+            Cookies.remove("cart");
         }
         setCart(next);
     }

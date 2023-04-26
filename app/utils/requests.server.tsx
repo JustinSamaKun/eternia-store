@@ -1,16 +1,13 @@
-import { createCookie } from "@remix-run/node"; // or cloudflare/deno
-
-export const cartCookie = createCookie("agora-cart-id", {
-    maxAge: 604_800 * 4, // four weeks
-    sameSite: "strict",
-    secure: true,
-    path: "*"
-});
-
 export function getStoreId(request: Request) {
     return request.headers.get("X-Agora-Store-Id") ?? 'AAABhUtFyNCsaqQL'
 }
 
-export async function getCartId(request: Request) {
-    return await cartCookie.parse(request.headers.get("Cookie"))
+export function getCartId(request: Request) {
+    const cookies = request.headers.get("Cookie")
+    if (!cookies) return null
+    for (let cookie of cookies.split(';')) {
+        const [key, val] = cookie.split('=')
+        if (key.trim() === 'cart') return val
+    }
+    return null
 }

@@ -5,16 +5,13 @@ import { Link } from 'react-router-dom';
 import { ISearchContext, SearchContext } from '../../context/SearchContext';
 import {ICategory} from "~/utils/graphql";
 import useShop from "~/hooks/useShop";
+import {ILoginContext, LoginContext} from "~/context/LoginContext";
 
-interface INavigationProps {
-    showLogin: () => void;
-}
-
-export const Navigation = (props: INavigationProps) => {
-    const { showLogin } = props;
+export const Navigation = () => {
     const shop = useShop()
 
-    const { cartID, updateCartOpen, updateCart } = useContext(CartContext) as ICartContext;
+    const { cart, updateCartOpen, updateCart } = useContext(CartContext) as ICartContext;
+    const { setShowLogIn } = useContext(LoginContext) as ILoginContext
     const { openSearchModal } = useContext(SearchContext) as ISearchContext;
 
     const handleLogout = () => {
@@ -22,8 +19,8 @@ export const Navigation = (props: INavigationProps) => {
     }
 
     const handleCartClick = () => {
-        if (cartID === null) {
-            showLogin();
+        if (cart === null) {
+            setShowLogIn(true);
             return;
         }
         updateCartOpen(true);
@@ -57,9 +54,9 @@ export const Navigation = (props: INavigationProps) => {
                         <CartIcon />
                     </a>
                     {
-                        cartID === null ?
-                            <a x-comp="PrimaryButtonLink" onClick={() => showLogin()} className="button-background -mt-[9px] md:-mt-[8px] inline-flex items-center cursor-pointer justify-center text-[14px] md:text-[16px] xl:text-d-p-lg h-11 box-border rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent font-black text-white-500 hover:bg-opacity-100 hover:text-custom-white-500 focus:bg-opacity-100 focus:text-custom-white-500 w-[90px] md:w-[118px] transition-colors duration-200 xl:order-1">Login</a>
-                            : <a x-comp="PrimaryButtonLink" onClick={() => handleLogout()} className="button-background -mt-[9px] md:-mt-[8px] inline-flex items-center cursor-pointer justify-center text-[14px] md:text-[16px] xl:text-d-p-lg h-11 box-border rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent font-black text-white-500 hover:bg-opacity-100 hover:text-custom-white-500 focus:bg-opacity-100 focus:text-custom-white-500 w-[90px] md:w-[118px] transition-colors duration-200 xl:order-1">Logout</a>
+                        cart === null ?
+                            <button x-comp="PrimaryButtonLink" onClick={() => setShowLogIn(true)} className="button-background inline-flex items-center cursor-pointer justify-center h-11 box-border rounded-full focus:outline-none font-black text-white-500 hover:bg-opacity-100 hover:text-custom-white-500 focus:bg-opacity-100 focus:text-custom-white-500 w-[90px] md:w-[118px] transition-colors duration-200 xl:order-1">Login</button>
+                            : <button x-comp="PrimaryButtonLink" onClick={() => handleLogout()} className="button-background inline-flex items-center cursor-pointer justify-center h-11 box-border rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent font-black text-white-500 hover:bg-opacity-100 hover:text-custom-white-500 focus:bg-opacity-100 focus:text-custom-white-500 w-[90px] md:w-[118px] transition-colors duration-200 xl:order-1">Logout</button>
                     }
                 </div>
             </header>

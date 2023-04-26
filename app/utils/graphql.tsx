@@ -40,41 +40,49 @@ export class GraphQLClient {
     }
 
     private async query<Data = any, Variables extends AnyVariables = AnyVariables>(query: DocumentInput<Data, Variables>, variables?: Variables) {
-        return this.client.query<Data, Variables>(query, variables ?? ({} as any), {
+        const result = await this.client.query<Data, Variables>(query, variables ?? ({} as any), {
             fetchOptions: {
                 headers: {
                     'X-Agora-Store-Id': this.shop
                 }
             }
         });
+
+        const { data } = result;
+
+        if (result.error || !data) {
+            return Promise.reject(result.error || new Error("No data received."));
+        }
+
+        return { data }
     }
 
     private async mutation<Data = any, Variables extends AnyVariables = AnyVariables>(query: DocumentInput<Data, Variables>, variables?: Variables) {
-        return this.client.mutation<Data, Variables>(query, variables ?? ({} as any), {
+        const result = await this.client.mutation<Data, Variables>(query, variables ?? ({} as any), {
             fetchOptions: {
                 headers: {
                     'X-Agora-Store-Id': this.shop
                 }
             }
         });
+
+        const { data } = result;
+
+        if (result.error || !data) {
+            return Promise.reject(result.error || new Error("No data received."));
+        }
+
+        return { data }
     }
 
     public async fetchShop() {
         const result = await this.query<ShopQueryResult>(SHOP_QUERY);
-
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
 
         return result.data.shop;
     }
 
     public async fetchPopularItems(amount?: number, user?: string, cart?: string) {
         const result = await this.query<PopularItemsResult>(POPULAR_ITEMS, { amount, user, cart });
-
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
 
         return result.data.topProducts;
     }
@@ -84,10 +92,6 @@ export class GraphQLClient {
         const variables = {product: handle};
         const result = await this.query<ProductQueryResult>(query, variables);
 
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
-
         return result.data;
     }
 
@@ -96,19 +100,11 @@ export class GraphQLClient {
         const variables = { tag };
         const result = await this.query<ProductsByTagResult>(query, variables);
 
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
-
         return result.data.productsByTag;
     }
 
     public async fetchCategories() {
         const result = await this.query<CategoriesQueryResult>(CATEGORIES_QUERY);
-
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
 
         return result.data.categories;
     }
@@ -118,10 +114,6 @@ export class GraphQLClient {
         const variables = { category: handle };
         const result = await this.query<CategoryQueryResult>(query, variables);
 
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
-
         return result.data.categoryByHandle;
     }
 
@@ -129,10 +121,6 @@ export class GraphQLClient {
         const query = PRODUCTS_BY_CATEGORY_QUERY;
         const variables = { category: handle };
         const result = await this.query<ProductsByCategoryQueryResult>(query, variables);
-
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
 
         return result.data.categoryByHandle;
     }
@@ -142,21 +130,19 @@ export class GraphQLClient {
         const variables = { cart: cartId };
         const result = await this.query<CartQueryResult>(query, variables);
 
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
-
         return result.data.cart;
+    }
+
+    public async fetchUser(user: string) {
+        const result = await this.query<UserQueryResult>(USER_QUERY, { user });
+
+        return result.data.user;
     }
 
     public async addCartLine(cartId: string, productId: string, quantity: number) {
         const mutation = CART_LINE_ADD;
         const variables = { cartId, productId, quantity };
         const result = await this.mutation<CartLineAddResult>(mutation, variables);
-
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
 
         return result.data.cartLineAdd;
     }
@@ -166,33 +152,19 @@ export class GraphQLClient {
         const variables = { ign, uuid };
         const result = await this.mutation<CartCreateResult>(mutation, variables);
 
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
-
         return result.data.cartCreate;
     }
 
-    public async createCheckout(cart: string, ip: string, country: string, returnURL?: string) {
-        // TODO: checkout create
-        const mutation = CART_CREATE;
-        const result = await this.mutation<CartCreateResult>(mutation, { cart, ip, country, returnURL });
+    public async createCheckout(cartId: string, ip: string, country: string, returnURL?: string) {
+        const result = await this.mutation<CartCheckoutResult>(CART_CHECKOUT, { cartId, ip, country, returnURL });
 
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
-
-        return result.data.cartCreate;
+        return result.data.cartCheckout;
     }
 
     public async removeCartLine(cartId: string, productId: string, quantity: number) {
         const mutation = CART_LINE_REMOVE;
         const variables = { cartId, productId, quantity };
         const result = await this.mutation<CartLineRemoveResult>(mutation, variables);
-
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
 
         return result.data.cartLineRemove;
     }
@@ -201,10 +173,6 @@ export class GraphQLClient {
         const mutation = CART_LINE_UPDATE;
         const variables = { cartId, lineId, quantity };
         const result = await this.mutation<CartLineUpdateResult>(mutation, variables);
-
-        if (result.error || !result.data) {
-            return Promise.reject(result.error || new Error("No data received."));
-        }
 
         return result.data.cartLineUpdate;
     }
@@ -237,7 +205,7 @@ const SHOP_QUERY = gql`
 `
 
 const POPULAR_ITEMS = gql`
-    query TopProducts($amount: Int, $user: String, $cart: String) {
+    query TopProducts($amount: Int, $user: String, $cart: ID) {
         topProducts(amount: $amount, user: $user, cart: $cart) {
             id
             handle
@@ -259,7 +227,6 @@ const PRODUCT_QUERY = gql`
             price {
                 price
                 listPrice
-                purchaseTypes
             }
             image
         },
@@ -268,7 +235,6 @@ const PRODUCT_QUERY = gql`
             price {
                 price
                 listPrice
-                purchaseTypes
             }
             image
         }
@@ -349,6 +315,7 @@ const PRODUCTS_BY_CATEGORY_QUERY = gql`
 
 const CART_INFO = `
     id
+    currency
     identity {
         username
         uuid
@@ -401,6 +368,16 @@ const CART_CREATE = gql`
             }
         ) {
             ${CART_INFO}
+        }
+    }
+`
+
+const CART_CHECKOUT = gql`
+    mutation CartCheckout($cartId: ID!, $country: String!, $ip: String!, $returnURL: String) {
+        cartCheckout(cartId: $cartId, country:$country, ip:$ip, returnURL: $returnURL) {
+            id
+            country
+            url
         }
     }
 `
@@ -499,6 +476,12 @@ export interface ICart {
     items: ICartItem[];
 }
 
+export interface ICheckout {
+    id: string
+    country: string
+    url: string
+}
+
 export interface Shop {
     id: string;
     title: string;
@@ -568,6 +551,10 @@ interface CartLineAddResult {
 
 interface CartCreateResult {
     cartCreate: ICart;
+}
+
+interface CartCheckoutResult {
+    cartCheckout: ICheckout;
 }
 
 interface CartLineRemoveResult {

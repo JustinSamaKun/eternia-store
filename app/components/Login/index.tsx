@@ -22,14 +22,16 @@ export const Login = () => {
         }
         setLoading(true);
 
-        client.fetchUser(input).then(({name, id}) => {
-            if (name === undefined || id === undefined) {
+        client.fetchUser(input).then(user => {
+            if (!user) {
                 setLoginError("Please enter a valid username.");
                 return;
             }
+            const {name, id} = user
             client.createCart(name, id)
                 .then(c => updateCart(c))
-                .then(r => setSuccess("Successfully logged in!"))
+                .then(() => setSuccess("Successfully logged in!"))
+                .then(() => setTimeout(() => setShowLogIn(false), 3000))
                 .finally(() => setLoading(false))
         });
     };
@@ -37,18 +39,20 @@ export const Login = () => {
     if (!showLogIn) return <></>
 
     return (
-        <section className={"fixed top-0 right-0 left-0 bottom-0 flex justify-center items-center"}>
-            <div className={"absolute top-0 right-0 left-0 bottom-0 blur-lg"}/>
-            <div className={"w-[40rem] p-14 rounded-lg border-gray-500 bg-gray-800 text-customn-white-200"}>
+        <section className={"fixed top-0 right-0 left-0 bottom-0 flex justify-center items-center "}>
+            <div className={"w-[40rem] z-40 p-14 rounded-lg border border-gray-500 bg-gray-800 text-customn-white-200"}>
                 <h1>Please login to continue</h1>
-                <input
-                    className=""
-                    placeholder="Enter your username"
-                    onChange={(e) => setInput(e.target.value)}
-                />
+                <div className={"flex flex-row gap-2 items-center"}>
+                    <input
+                        className="rounded-sm px-2 py-1"
+                        placeholder="Enter your username"
+                        onChange={(e) => setInput(e.target.value)}
+                    />
+                    <button disabled={loading} className="rounded-sm px-8 py-1 bg-agora-300 text-agora-500" onClick={() => handleLogin()}>{loading ? "Loading..." : "Login"}</button>
+                </div>
                 <span>{loginError !== "" ? loginError : success}</span>
-                <button disabled={loading} className="rounded-lg p-5 bg-agora-300 text-agora-500" onClick={() => handleLogin()}>{loading ? "Loading..." : "Login"}</button>
             </div>
+            <div className={"absolute top-0 right-0 left-0 bottom-0 backdrop-blur-lg bg-gray-200 opacity-10"} onClick={() => setShowLogIn(false)}/>
         </section>
     )
 }
