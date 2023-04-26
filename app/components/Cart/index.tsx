@@ -50,20 +50,34 @@ export const Cart = () => {
     const {setShowLogIn, showLogIn} = useContext(LoginContext) as ILoginContext
     const client = useClient()
     const [checkout, setCheckout] = useState<any>()
+    const [paypal, setPayPal] = useState<any>()
     const shop = useShop()
 
     useEffect(() => {
-        if (!cartOpen || !cart) return
-
-        client.createCheckout(cart.id, 'auto', 'auto', window.location.href)
-            .then(setCheckout);
-    }, [cart, cartOpen])
+        if (!cart) {
+            setCheckout(undefined)
+        } else {
+            client.createCheckout(cart.id, 'auto', 'auto', window.location.href)
+                .then(setCheckout)
+                .catch(() => setCheckout(undefined));
+        }
+    }, [cart])
     useEffect(() => {
-        if (!checkout || !cart) return
+        if (!checkout || !cart) {
+            setPayPal(undefined)
+            return
+        }
         retrievePayPalOrder(shop.id, cart, checkout)
-            .then(r => r.render("#paypal-button"))
-            .catch(r => console.error(r))
+            .then(setPayPal)
+            .catch(r => setPayPal(undefined))
     }, [checkout])
+    useEffect(() => {
+        if (!paypal) {
+            const e = document.getElementById("paypal-button")
+            if (e) e.innerHTML = ""
+        }
+        else paypal.render("#paypal-button")
+    }, [paypal])
 
     if (cartOpen && !cart) {
         // they want to log in
@@ -109,6 +123,7 @@ export const Cart = () => {
 
     return (
         <>
+            {cartOpen && <div className={"absolute inset-0 backdrop-blur-lg bg-gray-200 opacity-10"} onClick={() => updateCartOpen(false)}/>}
             <section tabIndex={-1}
                      className={`fixed inset-0 ml-auto overflow-auto overflow-hidden transition-all`}
                      style={{maxWidth: cartOpen ? '100vw' : '0vw'}}
@@ -119,8 +134,6 @@ export const Cart = () => {
                     {content}
                 </div>
             </section>
-            {cartOpen && <div className={"absolute inset-0 backdrop-blur-lg bg-gray-200 opacity-10"}
-                  onClick={() => updateCartOpen(false)}/>}
         </>
     )
 }
