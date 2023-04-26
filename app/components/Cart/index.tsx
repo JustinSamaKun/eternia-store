@@ -108,12 +108,19 @@ export const Cart = () => {
     }
 
     return (
-        <section tabIndex={-1} className={`fixed inset-0 overflow-auto ${cartOpen ? "" : "hidden"}`}>
-            <div className={"absolute inset-0 backdrop-blur-lg bg-gray-200 opacity-10"}
-                  onClick={() => updateCartOpen(false)}/>
-            <div className={`h-full ml-auto w-1/3 overflow-hidden transition-all bg-card-background-500 drop-shadow-xl border-l border-l-gray-500 ${cartOpen ? 'max-w-full' : 'max-w-0'}`}>
-                {content}
-            </div>
-        </section>
+        <>
+            <section tabIndex={-1}
+                     className={`fixed inset-0 ml-auto overflow-auto overflow-hidden transition-all`}
+                     style={{maxWidth: cartOpen ? '100vw' : '0vw'}}
+            >
+                <div
+                    className={`h-full ml-auto w-1/3 bg-card-background-500 drop-shadow-xl border-l border-l-gray-500`}
+                >
+                    {content}
+                </div>
+            </section>
+            {cartOpen && <div className={"absolute inset-0 backdrop-blur-lg bg-gray-200 opacity-10"}
+                  onClick={() => updateCartOpen(false)}/>}
+        </>
     )
 }
