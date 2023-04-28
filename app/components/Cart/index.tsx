@@ -87,7 +87,7 @@ export const Cart = () => {
 
     return (
         <>
-            {cartOpen && <div className={"absolute inset-0 backdrop-blur-lg bg-gray-200 opacity-10"} onClick={() => updateCartOpen(false)}/>}
+            {cartOpen && <div className={"fixed inset-0 backdrop-blur-lg bg-gray-200 opacity-10"} onClick={() => updateCartOpen(false)}/>}
             <section tabIndex={-1}
                      className={`fixed inset-0 w-1/3 ml-auto overflow-auto overflow-hidden transition-all`}
                      style={{maxWidth: cartOpen ? '33vw' : '0vw'}}
