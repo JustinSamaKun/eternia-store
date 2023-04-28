@@ -23,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return { featured, top, favorites }
 }
 
-export default function homepage() {
+export default function Homepage() {
     const {featured, top, favorites} = useLoaderData()
     const shop = useShop()
     const { cart } = useContext(CartContext)
@@ -39,19 +39,18 @@ export default function homepage() {
     }, [cart?.identity.uuid])
 
     return (
-        <>
+        <div className={"flex flex-col gap-20"}>
             <Slider featured={featured}/>
-            <div className={"flex flex-col gap-2"}>
-                <h2 className={"text-customn-white-200 font-bold text-xl"}>Shop By Category</h2>
-                <div className={"flex flex-row justify-between items-center"}>
+            <div className={"flex flex-col gap-4"}>
+                <h2 className={"text-customn-white-200 font-bold text-2xl"}>Shop By Category</h2>
+                <div className={"flex flex-row justify-between items-center gap-4"}>
                     {shop.categories
                         .flatMap(c => c.subcategories.length > 0 ? c.subcategories : [c])
                         .slice(0, 3)
                         .map(c => (
-                            <div className={"flex flex-col flex-1 justify-between"}>
-                                <h3>{c.title}</h3>
-                                <Link className={"rounded-md border-gray-500"} to={`/category/${c.id}`}>
-                                    Visit
+                            <div key={c.id} className={"flex flex-col flex-1 justify-between"}>
+                                <Link className={"rounded-md border-white bg-white bg-opacity-10 border px-8 py-2 text-center text-white"} to={`/category/${c.id}`}>
+                                    Shop {c.title}
                                 </Link>
                             </div>
                         ))
@@ -59,19 +58,19 @@ export default function homepage() {
                 </div>
             </div>
             {favorites.length > 0 &&
-                <div className={"flex flex-col gap-2"}>
-                    <h2 className={"text-customn-white-200 font-bold text-xl"}>Your Favorites</h2>
+                <div className={"flex flex-col gap-4"}>
+                    <h2 className={"text-customn-white-200 font-bold text-2xl"}>Your Favorites</h2>
                     <div className={"flex flex-row overflow-x-auto gap-4 items-center"}>
-                        {favorites.map((p: IProduct) => <ItemCard product={p}/>)}
+                        {favorites.map((p: IProduct) => <ItemCard key={p.id} product={p}/>)}
                     </div>
                 </div>
             }
-            <div className={"flex flex-col gap-2"}>
-                <h2 className={"text-customn-white-200 font-bold text-xl"}>Most Popular</h2>
+            <div className={"flex flex-col gap-4"}>
+                <h2 className={"text-customn-white-200 font-bold text-2xl"}>Most Popular</h2>
                 <div className={"flex flex-row overflow-x-auto gap-4 items-center"}>
-                    {top.map((p: IProduct) => <ItemCard product={p}/>)}
+                    {top.map((p: IProduct) => <ItemCard key={p.id} product={p}/>)}
                 </div>
             </div>
-        </>
+        </div>
     )
 }

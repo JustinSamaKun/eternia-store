@@ -20,7 +20,6 @@ const SearchProvider = ({ children }: any) => {
     }
 
     const searchItems = (query: string): IProduct[] => {
-        console.log(items)
         if (query === "") {
             return [];
         }

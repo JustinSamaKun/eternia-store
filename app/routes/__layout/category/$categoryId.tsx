@@ -21,8 +21,6 @@ export default function Category() {
     const { category } = useLoaderData() as { category: ICategoryInfo }
     const [sort, setSort] = useState<(a: IProduct, b: IProduct) => number>()
     const [selectedRanges, setSelected] = useState<number[]>([])
-    const [priceMin, setPriceMin] = useState<number>()
-    const [priceMax, setPriceMax] = useState<number>()
 
     const ranges = [
         [0, 10],
@@ -32,8 +30,13 @@ export default function Category() {
     ]
 
     let products = category.products
-        .filter(p => priceMin === undefined || parseFloat(p.price.price) >= priceMin)
-        .filter(p => priceMax === undefined || parseFloat(p.price.price) <= priceMax)
+        .filter(p =>
+            selectedRanges.length === 0 ||
+            selectedRanges
+                .map(v => ranges[v])
+                .filter(([min, max]) => (min === undefined || parseFloat(p.price.price) >= min) && (max === undefined || parseFloat(p.price.price) <= max))
+                .length > 0
+        )
 
     if (sort) {
         products = products.sort(sort)
@@ -68,8 +71,6 @@ export default function Category() {
                                     } else {
                                         setSelected([...selectedRanges, i])
                                     }
-                                    setPriceMin(selectedRanges.map(r => ranges[r][0]).reduce((a, b) => !a || !b ? undefined : Math.min(a, b)))
-                                    setPriceMax(selectedRanges.map(r => ranges[r][1]).reduce((a, b) => !a || !b ? undefined : Math.max(a, b)))
                                 }}
                             >
                                 {range[1] ? `$${range[0]} to $${range[1]}` : `$${range[0]}+`}

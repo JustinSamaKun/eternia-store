@@ -28,7 +28,7 @@ export const Navigation = () => {
 
     return (
         <div>
-            <header className="pr-5 py-3 md:py-9 flex flex-row justify-between items-center text-white">
+            <header className="py-3 flex flex-row justify-between items-center text-white">
                 <Link x-comp="NavLink" aria-label="Remix" aria-current="page" className="active" to="/">
                     <img
                         className="object-contain fadeIn invisible md:visible h-20 w-48"
@@ -44,12 +44,12 @@ export const Navigation = () => {
                         )
                     })}
                 </div>
-                <div className="float-right flex flex-row">
-                    <a className="cursor-pointer mr-6" onClick={() => openSearchModal(true)}>
+                <div className="float-right flex flex-row items-center">
+                    {/*<a className="cursor-pointer mr-6" onClick={() => openSearchModal(true)}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                         </svg>
-                    </a>
+                    </a>*/}
                     <a className="cursor-pointer mr-5" onClick={handleCartClick}>
                         <CartIcon />
                     </a>

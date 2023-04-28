@@ -184,6 +184,12 @@ const SHOP_QUERY = gql`
             id
             title
             description
+            theme {
+                variables {
+                    key
+                    value
+                }
+            }
             branding {
                 logo
                 icon
@@ -488,6 +494,7 @@ export interface Shop {
     description: string;
     branding: IBranding;
     categories: ICategory[];
+    variables: [{key: string, value: string}]
 }
 
 // TypeScript interfaces for query results

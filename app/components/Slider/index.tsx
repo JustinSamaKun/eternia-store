@@ -39,16 +39,9 @@ export const Slider = ({ featured }: { featured: IProductInfo[] }) => {
                     </svg>
                 </button>
                 <div className="flex flex-row justify-center items-center">
-                    {featured.map((feature: IProductInfo, i: number) => {
-                        return (
-                            <>
-                            { // TODO put color for selected
-                                page === i ? <div className="bg-custom-gray-200 ml-1 mr-1 rounded-full w-1 h-1"/>
-                                    : <div className="bg-custom-gray-700 ml-1 mr-1 rounded-full w-1 h-1"/>
-                            }
-                            </>
-                        )
-                    })}
+                    {featured.map((feature: IProductInfo, i: number) => (
+                        <div key={i} className={`${page === i ? "bg-custom-gray-200" : "bg-custom-gray-700"} ml-1 mr-1 rounded-full w-1 h-1`}/>
+                    ))}
                 </div>
                 <button className="ml-3" onClick={() => handlePageChange(page + 1)}>
                     <svg onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={isHovered ? "#F0F0F0" : "#E0E8FE"} className="w-10 h-10">

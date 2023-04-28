@@ -4,7 +4,7 @@ import { SnackBarContext, ISnackBarMessage, ISnackBarContext } from '~/context/S
 import {Outlet, useLoaderData} from "@remix-run/react";
 import React, {useContext, useState} from "react";
 import {getCartId} from "~/utils/requests.server";
-import {useClient} from "~/utils/graphql";
+import {ICategory, useClient} from "~/utils/graphql";
 import {json} from "@remix-run/node";
 import {Modal} from "~/components/Modal";
 import CartProvider from "~/context/CartContext";
@@ -21,7 +21,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         cartId ? client.fetchCart(cartId) : null
     ])
 
-    return json({ shop, cart })
+    return { shop, cart }
 }
 
 export default function __layout() {
@@ -34,10 +34,30 @@ export default function __layout() {
                 <ShopProvider shop={shop}>
                     <SearchProvider>
                         <LoginProvider>
-                            <div className="relative mx-auto px-8 max-w-[90rem] min-h-screen flex flex-col">
-                                <Navigation/>
-                                <Outlet/>
-                                <Search/>
+                            <div className={"flex flex-col min-h-screen gap-8"}>
+                                <div className="relative mx-auto px-8 min-w-[90rem] max-w-[90rem] flex flex-col">
+                                    <Navigation/>
+                                    <Search/>
+                                    <Outlet/>
+                                </div>
+                                <footer className={"text-white bg-gray-800 mt-auto"}>
+                                    <div className={"border-t border-b border-gray-500 py-4"}>
+                                        <div className="max-w-[90rem] flex flex-col justify-center mx-auto">
+                                            <div className={"flex flex-row justify-between items-center"}>
+                                                <img className={"w-16 aspect-square"} src={"/favicon.ico"} />
+                                                <div className={"flex flex-row gap-4"}>
+                                                    {shop.categories.map((c: ICategory) => (
+                                                        <a key={c.id} href={`/category/${c.handle}`}>{c.title}</a>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className={"flex flex-row py-4 justify-evenly items-center"}>
+                                        <div>Copyright © {new Date().getFullYear()} {shop.title}. All Rights Reserved</div>
+                                        <div>Not affiliated with Mojang</div>
+                                    </div>
+                                </footer>
                             </div>
                             {snackBar.map((alert: ISnackBarMessage) => {
                                 return (
