@@ -49,7 +49,7 @@ export default function Homepage() {
                         .slice(0, 3)
                         .map(c => (
                             <div key={c.id} className={"flex flex-col flex-1 justify-between"}>
-                                <Link className={"rounded-md border-white bg-white bg-opacity-10 border px-8 py-2 text-center text-white"} to={`/category/${c.id}`}>
+                                <Link className={"rounded-md border-white bg-white bg-opacity-10 border px-8 py-2 text-center text-white"} to={`/category/${c.handle}`}>
                                     Shop {c.title}
                                 </Link>
                             </div>

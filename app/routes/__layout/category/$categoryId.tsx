@@ -17,9 +17,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     })
 }
 
+const sortFunctions: {[key: string]: (a: IProduct, b: IProduct) => number} = {
+    price: (a, b) => parseFloat(b.price.price) - parseFloat(a.price.price),
+    name: (a, b) => a.title.localeCompare(b.title)
+}
+
 export default function Category() {
     const { category } = useLoaderData() as { category: ICategoryInfo }
-    const [sort, setSort] = useState<(a: IProduct, b: IProduct) => number>()
+    const [sort, setSort] = useState<string>('default')
     const [selectedRanges, setSelected] = useState<number[]>([])
 
     const ranges = [
@@ -38,8 +43,8 @@ export default function Category() {
                 .length > 0
         )
 
-    if (sort) {
-        products = products.sort(sort)
+    if (sort !== 'default') {
+        products = products.sort(sortFunctions[sort])
     }
 
     return (
@@ -47,17 +52,17 @@ export default function Category() {
             <div className={"flex flex-row py-10 justify-center"}>
                 <div className={"flex flex-col gap-4"}>
                     <h1 className={"text-3xl"}>{category.title}</h1>
-                    <h3 className={"text-gray-900"}>{category.description}</h3>
+                    <h3 className={"text-gray-900"} dangerouslySetInnerHTML={{ __html: category.description }} />
                 </div>
             </div>
             <div className={"flex flex-row flex-1 gap-20"}>
                 <div className={"flex flex-col w-60 gap-4"}>
                     <div className={"flex flex-row justify-between"}>
                         <span>Sort by</span>
-                        <select className={"bg-transparent border-b border-white"}>
-                            <option>Default</option>
-                            <option>Price</option>
-                            <option>Name</option>
+                        <select className={"bg-transparent border-b border-white"} value={sort} onChange={({target: {value}}) => setSort(value)}>
+                            <option value={'default'}>Default</option>
+                            <option value={"price"}>Price</option>
+                            <option value={"name"}>Name</option>
                         </select>
                     </div>
                     <div className={"flex flex-col w-60 gap-2"}>
