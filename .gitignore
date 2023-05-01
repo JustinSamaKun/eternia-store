@@ -9,3 +9,4 @@ node_modules
 /package-lock.json
 /webstore.iml
 /app/tailwind.css
+dist/index.js

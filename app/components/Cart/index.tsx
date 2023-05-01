@@ -123,7 +123,7 @@ export const Cart = () => {
                             </div>
                             {checkout && <a target={"_blank"}
                                             className={"rounded-md bg-white border border-black h-10 flex justify-center items-center"}
-                                            href={checkout.url}>Secure Checkout</a>}
+                                            href={`/checkout?id=${checkout.id}`}>Secure Checkout</a>}
                             <div id={"paypal-button"}/>
                         </div>
                     </div>
