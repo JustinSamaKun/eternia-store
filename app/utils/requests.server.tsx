@@ -1,5 +1,7 @@
 export function getStoreId(request: Request) {
-    return request.headers.get("X-Agora-Store-Id") ?? 'AAABhUtFyNCsaqQL'
+    const id = request.headers.get("X-Agora-Store-Id")
+    if (!id) throw new Error("No store id in request!")
+    return id
 }
 
 export function getCartId(request: Request) {

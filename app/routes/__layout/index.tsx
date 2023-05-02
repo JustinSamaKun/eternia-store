@@ -1,11 +1,10 @@
 import {Cart, Search, Slider} from "~/components";
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {useLoaderData, useNavigate} from "@remix-run/react";
+import {Links, Meta, Scripts, useLoaderData, useNavigate} from "@remix-run/react";
 import {LoaderFunctionArgs} from "@remix-run/router";
 import {IProduct, useClient} from "~/utils/graphql";
 import useShop from "~/hooks/useShop";
 import {Link} from "react-router-dom";
-import {cli} from "@remix-run/dev";
 import {ItemCard} from "~/components/ItemCard";
 import {getCartId} from "~/utils/requests.server";
 import {CartContext} from "~/context/CartContext";
@@ -23,6 +22,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return { featured, top, favorites }
 }
 
+export function ErrorBoundary({ error }: any) {
+    console.error(error);
+    return (
+        <html>
+        <head>
+            <title>Oh no!</title>
+            <Meta />
+            <Links />
+        </head>
+        <body>
+        <div>Something went wrong on the homepage...</div>
+        <Scripts />
+        </body>
+        </html>
+    );
+}
+
 export default function Homepage() {
     const {featured, top, favorites} = useLoaderData()
     const shop = useShop()
@@ -38,15 +54,17 @@ export default function Homepage() {
         navigate('.', { replace: true })
     }, [cart?.identity.uuid])
 
+    const categories = shop.categories
+        .flatMap(c => c.subcategories.length > 0 ? c.subcategories : [c])
+
     return (
         <div className={"flex flex-col gap-20"}>
             <Slider featured={featured}/>
             <div className={"flex flex-col gap-4"}>
                 <h2 className={"text-customn-white-200 font-bold text-2xl"}>Shop By Category</h2>
                 <div className={"flex flex-row justify-between items-center gap-4"}>
-                    {shop.categories
-                        .flatMap(c => c.subcategories.length > 0 ? c.subcategories : [c])
-                        .slice(0, 3)
+                    {categories
+                        .slice(0, Math.min(categories.length, 3))
                         .map(c => (
                             <div key={c.id} className={"flex flex-col flex-1 justify-between"}>
                                 <Link className={"rounded-md border-white bg-white bg-opacity-10 border px-8 py-2 text-center text-white"} to={`/category/${c.handle}`}>

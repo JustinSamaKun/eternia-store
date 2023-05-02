@@ -12,7 +12,7 @@ const PUBLIC_SECRET = 'pk_test_51MQe54ISFEwmK0SWhLN2ayXjeHQWFz2Lg1FEQg32UOHfQMCq
 const PAYPAL_CLIENT_ID = 'AVQgsOkIC75aGbI7KdsS02PjtMB63rO-rpK5Y_0TXrh-jsubuvb9fCcIT-KrDQrjp-5F30Qm6T8VeUTq'
 
 async function retrievePayPalOrder(shopId: string, cart: ICart, checkout: ICheckout) {
-    const { paypalId, paypalOrderId } = await fetch('http://localhost:4000/payments/orderinfo', {
+    const { paypalId, paypalOrderId } = await fetch('http://admin.agoramp.com/payments/orderinfo', {
         method: "POST",
         body: JSON.stringify({
             checkoutId: checkout.id,
@@ -67,9 +67,13 @@ export const Cart = () => {
             setPayPal(undefined)
             return
         }
-        retrievePayPalOrder(shop.id, cart, checkout)
-            .then(setPayPal)
-            .catch(r => setPayPal(undefined))
+        try {
+            retrievePayPalOrder(shop.id, cart, checkout)
+                .then(setPayPal)
+                .catch(r => setPayPal(undefined))
+        } catch (e) {
+            console.error(e)
+        }
     }, [checkout])
     useEffect(() => {
         if (!paypal) return

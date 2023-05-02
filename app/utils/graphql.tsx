@@ -10,17 +10,16 @@ import {
 } from "urql";
 import {getStoreId} from "~/utils/requests.server";
 import useShop from "~/hooks/useShop";
-import {useLocation} from "react-router";
 
 export function useClient(request?: Request) {
     let store: string, url: string;
     if (request) {
         store = getStoreId(request)
-        url = 'http://localhost:4000/graphql';
+        url = 'http://agora-api-service.default.svc.cluster.local/graphql';
     } else {
         const shop = useShop();
         store = shop.id;
-        url = 'http://localhost:4000/graphql';
+        url = 'http://admin.agoramp.com/graphql';
     }
 
     return new GraphQLClient(createClient({

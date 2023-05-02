@@ -1,9 +1,9 @@
 import {LoaderFunctionArgs} from "@remix-run/router";
 import {Alert, Cart, Login, Navigation, Search} from '~/components';
 import { SnackBarContext, ISnackBarMessage, ISnackBarContext } from '~/context/SnackBar';
-import {Outlet, useLoaderData} from "@remix-run/react";
+import {Links, Meta, Outlet, Scripts, useLoaderData} from "@remix-run/react";
 import React, {useContext, useState} from "react";
-import {getCartId} from "~/utils/requests.server";
+import {getCartId, getStoreId} from "~/utils/requests.server";
 import {ICategory, useClient} from "~/utils/graphql";
 import {json} from "@remix-run/node";
 import {Modal} from "~/components/Modal";
@@ -14,14 +14,36 @@ import LoginProvider from "~/context/LoginContext";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const cartId = getCartId(request)
-    const client = useClient(request)
+    try {
+        const client = useClient(request)
 
-    const [shop, cart] = await Promise.all([
-        client.fetchShop(),
-        cartId ? client.fetchCart(cartId) : null
-    ])
+        const [shop, cart] = await Promise.all([
+            client.fetchShop(),
+            cartId ? client.fetchCart(cartId) : null
+        ])
 
-    return { shop, cart }
+        return { shop, cart }
+    } catch (e) {
+        console.error(cartId, getStoreId(request), e)
+        throw e
+    }
+}
+
+export function ErrorBoundary({ error }: any) {
+    console.error(error);
+    return (
+        <html>
+        <head>
+            <title>Oh no!</title>
+            <Meta />
+            <Links />
+        </head>
+        <body>
+            <div>Something went wrong...</div>
+            <Scripts />
+        </body>
+        </html>
+    );
 }
 
 export default function __layout() {
