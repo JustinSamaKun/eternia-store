@@ -19,7 +19,7 @@ export function useClient(request?: Request) {
     } else {
         const shop = useShop();
         store = shop.id;
-        url = 'http://admin.agoramp.com/graphql';
+        url = 'http://api.agoramp.com/graphql';
     }
 
     return new GraphQLClient(createClient({

@@ -22,23 +22,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return { featured, top, favorites }
 }
 
-export function ErrorBoundary({ error }: any) {
-    console.error(error);
-    return (
-        <html>
-        <head>
-            <title>Oh no!</title>
-            <Meta />
-            <Links />
-        </head>
-        <body>
-        <div>Something went wrong on the homepage...</div>
-        <Scripts />
-        </body>
-        </html>
-    );
-}
-
 export default function Homepage() {
     const {featured, top, favorites} = useLoaderData()
     const shop = useShop()

@@ -29,23 +29,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 }
 
-export function ErrorBoundary({ error }: any) {
-    console.error(error);
-    return (
-        <html>
-        <head>
-            <title>Oh no!</title>
-            <Meta />
-            <Links />
-        </head>
-        <body>
-            <div>Something went wrong...</div>
-            <Scripts />
-        </body>
-        </html>
-    );
-}
-
 export default function __layout() {
     const {shop, cart} = useLoaderData()
     const {snackBar} = useContext(SnackBarContext) as ISnackBarContext;

@@ -12,7 +12,7 @@ const PUBLIC_SECRET = 'pk_test_51MQe54ISFEwmK0SWhLN2ayXjeHQWFz2Lg1FEQg32UOHfQMCq
 const PAYPAL_CLIENT_ID = 'AVQgsOkIC75aGbI7KdsS02PjtMB63rO-rpK5Y_0TXrh-jsubuvb9fCcIT-KrDQrjp-5F30Qm6T8VeUTq'
 
 async function retrievePayPalOrder(shopId: string, cart: ICart, checkout: ICheckout) {
-    const { paypalId, paypalOrderId } = await fetch('http://admin.agoramp.com/payments/orderinfo', {
+    const { paypalId, paypalOrderId } = await fetch('http://api.agoramp.com/payments/orderinfo', {
         method: "POST",
         body: JSON.stringify({
             checkoutId: checkout.id,
