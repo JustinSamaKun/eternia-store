@@ -2,12 +2,15 @@ import { useContext, useState, useEffect} from "react";
 import { CartContext, ICartContext } from "~/context/CartContext";
 
 import { AnyVariables } from "urql";
-import {ICartItem, useClient} from "~/utils/graphql";
+import {useClient} from "~/utils/graphql";
 import {ISnackBarContext, MessageType, SnackBarContext} from "~/context/SnackBar";
+import {CartInfoFragment} from "~/graphql/generated/graphql";
+import {CART_LINE_ADD, CART_LINE_REMOVE, CART_LINE_UPDATE} from "~/graphql/cart";
 
-export const CartItem = (props: ICartItem) => {
+export const CartItem = (props: CartInfoFragment['items'][0]) => {
     const {cartID, updateCart} = useContext(CartContext) as ICartContext;
     const {addMessage} = useContext(SnackBarContext) as ISnackBarContext;
+
 
     if (!cartID) return <></>
 
@@ -16,39 +19,39 @@ export const CartItem = (props: ICartItem) => {
     const client = useClient()
 
     const handleDeleteItem = (): void => {
-        client.removeCartLine(cartID, props.product.id, props.quantity)
-            .then(r => updateCart(r))
+        client.mutation(CART_LINE_REMOVE, {cartId: cartID, productId: props.product.id, quantity: props.quantity})
+            .then(r => updateCart(r.cartLineRemove))
             .then(() => addMessage(MessageType.SUCCESS, "Removed item from cart!"))
             .catch(() => addMessage(MessageType.ERROR, "Unable to remove from cart."));
     }
 
     const handleRemove = (quantity: number): void => {
-        client.removeCartLine(cartID, props.product.id, quantity)
-            .then(r => updateCart(r))
+        client.mutation(CART_LINE_REMOVE, {cartId: cartID, productId: props.product.id, quantity: quantity})
+            .then(r => updateCart(r.cartLineRemove))
             .then(() => addMessage(MessageType.SUCCESS, "Removed item from cart!"))
             .catch(() => addMessage(MessageType.ERROR, "Unable to remove from cart."));
     }
 
     const handleAdd = (quantity: number): void => {
-        client.addCartLine(cartID, props.product.id, quantity)
-            .then(r => updateCart(r))
+        client.mutation(CART_LINE_ADD, {cartId: cartID, productId: props.product.id, quantity: quantity})
+            .then(r => updateCart(r.cartLineAdd))
             .then(() => addMessage(MessageType.SUCCESS, "Added item to cart!"))
             .catch(() => addMessage(MessageType.ERROR, "Unable to add to cart."));
     }
 
     useEffect(() => {
         if (quantity != null) {
-            client.updateCartLine(cartID, props.product.id, quantity)
-                .then(r => updateCart(r))
-                .then(() => addMessage(MessageType.SUCCESS, "Added item to cart!"))
-                .catch(() => addMessage(MessageType.ERROR, "Unable to add to cart."));
+            client.mutation(CART_LINE_UPDATE, {cartId: cartID, lineId: props.id, quantity: quantity})
+                .then(r => updateCart(r.cartLineUpdate))
+                .then(() => addMessage(MessageType.SUCCESS, "Updated item!"))
+                .catch(() => addMessage(MessageType.ERROR, "Unable to update cart."));
         }
     }, [quantity])
 
     return (
         <div className="p-5 flex flex-row items-center gap-4">
             <div className={"w-20 rounded-md"}>
-                <img className={"aspect-square object-contain"} alt={props.product.handle} src={props.product.image} />
+                <img className={"aspect-square object-contain"} alt={props.product.handle} src={props.product.image ?? "https://cdn.agoramp.com/static/209/assets/blank_product.png"}/>
             </div>
             <div className="flex flex-col flex-1 h-full justify-between">
                 <div className={"flex flex-row justify-between"}>

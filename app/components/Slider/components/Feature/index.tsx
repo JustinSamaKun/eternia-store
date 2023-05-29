@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 
-import { ItemDetails } from "../../../ItemDetails";
-import { IFeature } from "../../types";
-import {IProductInfo} from "~/utils/graphql";
-
 const LENGTH = 125;
 
-export const Feature = (props: IProductInfo) => {
+export const Feature = (props: any) => {
     const { id, title, description, image, handle } = props;
     const [viewDetails, setViewDetails] = useState<boolean>(false);
 

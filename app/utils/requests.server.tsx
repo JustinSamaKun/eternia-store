@@ -1,5 +1,7 @@
+import * as process from "process";
+
 export function getStoreId(request: Request) {
-    const id = request.headers.get("X-Agora-Store-Id")
+    const id = request.headers.get("X-Agora-Store-Id") ?? process.env.STORE_ID
     if (!id) throw new Error("No store id in request!")
     return id
 }

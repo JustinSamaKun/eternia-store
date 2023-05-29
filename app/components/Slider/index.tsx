@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { Feature } from "./components/Feature";
 
-import {IProductInfo, useClient} from "~/utils/graphql";
 
-
-export const Slider = ({ featured }: { featured: IProductInfo[] }) => {
+export const Slider = ({ featured }: { featured: any[] }) => {
 
     const [page, setPage] = useState<number>(0);
     const [timer, setTimer] = useState<NodeJS.Timeout>();
@@ -23,7 +21,7 @@ export const Slider = ({ featured }: { featured: IProductInfo[] }) => {
 
     return (
         <section className="slideshow">
-            {featured.map((feature: IProductInfo, i: number) => {
+            {featured.map((feature, i: number) => {
                     return (
                         <div key={i} className={"content w-full" + (i < page ? " before" : i > page ? " after" : "")}>
                             <Feature
@@ -39,7 +37,7 @@ export const Slider = ({ featured }: { featured: IProductInfo[] }) => {
                     </svg>
                 </button>
                 <div className="flex flex-row justify-center items-center">
-                    {featured.map((feature: IProductInfo, i: number) => (
+                    {featured.map((feature, i: number) => (
                         <div key={i} className={`${page === i ? "bg-custom-gray-200" : "bg-custom-gray-700"} ml-1 mr-1 rounded-full w-1 h-1`}/>
                     ))}
                 </div>

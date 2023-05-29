@@ -6,7 +6,7 @@ export const CartIcon = () => {
     const [cartSize, setCartSize] = useState<number>();
 
     useEffect(() => {
-        if (cart !== null) {
+        if (cart) {
             setCartSize(cart.items.length > 0 ? cart.items.map(i => i.quantity).reduce((a, b) => a + b) : 0);
         } else {
             setCartSize(undefined);

@@ -1,11 +1,11 @@
-import { useMutation } from "urql";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 
 import { CartContext, ICartContext } from "~/context/CartContext";
 import { LoginContext, ILoginContext } from "~/context/LoginContext";
 import { SnackBarContext, ISnackBarContext, MessageType } from '~/context/SnackBar';
 import {IAddToCartProps} from "~/components/AddToCart/types";
 import {useClient} from "~/utils/graphql";
+import {CART_LINE_ADD} from "~/graphql/cart";
 
 export const AddToCart = (props: IAddToCartProps) => {
     const { cartID, updateCart } = useContext(CartContext) as ICartContext;
@@ -21,8 +21,8 @@ export const AddToCart = (props: IAddToCartProps) => {
             return;
         }
         // Add to cart from cartID
-        client.addCartLine(cartID, productId, quantity)
-            .then(r => updateCart(r))
+        client.mutation(CART_LINE_ADD, { cartId: cartID, productId, quantity })
+            .then(r => updateCart(r.cartLineAdd))
             .then(() => addMessage(MessageType.SUCCESS, "Added item to cart!"))
             .catch(() => addMessage(MessageType.ERROR, "Unable to add to cart."));
     }

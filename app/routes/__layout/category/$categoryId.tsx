@@ -1,9 +1,11 @@
 import {LoaderFunctionArgs} from "@remix-run/router";
 import {useLoaderData} from "@remix-run/react";
-import {ICategory, ICategoryInfo, IProduct, useClient} from "~/utils/graphql";
+import {useClient} from "~/utils/graphql";
 import {json, redirect} from "@remix-run/node";
 import {ItemCard} from "~/components/ItemCard";
 import {useState} from "react";
+import {CATEGORY_QUERY, IProduct, ProductInfo} from "~/graphql/shop";
+import {FragmentType, useFragment} from "~/graphql/generated";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const client = useClient(request)
@@ -13,7 +15,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!handle) return redirect('/')
 
     return json({
-        category: await client.fetchCategoryByHandle(handle)
+        category: await client.query(CATEGORY_QUERY, { category: handle }).then(r => r.categoryByHandle)
     })
 }
 
@@ -23,9 +25,14 @@ const sortFunctions: {[key: string]: (a: IProduct, b: IProduct) => number} = {
 }
 
 export default function Category() {
-    const { category } = useLoaderData() as { category: ICategoryInfo }
+    const { category } = useLoaderData<typeof loader>()
     const [sort, setSort] = useState<string>('default')
     const [selectedRanges, setSelected] = useState<number[]>([])
+
+    if (!category) {
+        // 404 page?
+        return <div />
+    }
 
     const ranges = [
         [0, 10],
@@ -35,7 +42,8 @@ export default function Category() {
     ]
 
     let products = category.products
-        .filter(p =>
+        .map(p => useFragment(ProductInfo, p as FragmentType<typeof ProductInfo>))
+        .filter((p) =>
             selectedRanges.length === 0 ||
             selectedRanges
                 .map(v => ranges[v])

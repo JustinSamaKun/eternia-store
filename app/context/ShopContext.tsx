@@ -1,11 +1,8 @@
 import React from "react";
-import {Shop} from "~/utils/graphql";
+import {ShopQuery} from "~/graphql/generated/graphql";
 
-export interface IShopContext {
-    shop: Shop
-}
 
-export const ShopContext = React.createContext<IShopContext>({ shop: {} as any as Shop });
+export const ShopContext = React.createContext<ShopQuery>({ shop: {} as any as ShopQuery["shop"] });
 
 export const ShopProvider = ({ children, shop }: any) => {
     return (

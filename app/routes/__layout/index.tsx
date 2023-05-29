@@ -2,28 +2,34 @@ import {Slider} from "~/components";
 import React, {useContext, useEffect, useRef} from "react";
 import {useLoaderData, useNavigate} from "@remix-run/react";
 import {LoaderFunctionArgs} from "@remix-run/router";
-import {IProduct, useClient} from "~/utils/graphql";
+import {useClient} from "~/utils/graphql";
 import useShop from "~/hooks/useShop";
 import {Link} from "react-router-dom";
 import {ItemCard} from "~/components/ItemCard";
 import {getCartId} from "~/utils/requests.server";
 import {CartContext} from "~/context/CartContext";
+import {IProduct, POPULAR_ITEMS, ProductInfo} from "~/graphql/shop";
+import {FragmentType, useFragment} from "~/graphql/generated";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const client = useClient(request)
     const cartId = getCartId(request)
 
-    const [featured, top, favorites] = await Promise.all([
-        client.fetchProductsByTag('slideshow'),
-        client.fetchPopularItems(5),
-        cartId ? client.fetchPopularItems(5, undefined, cartId) : []
+    const [top, favorites] = await Promise.all([
+        client
+            .query(POPULAR_ITEMS, { amount: 5 })
+            .then(r => r.topProducts.map(p => useFragment(ProductInfo, p as FragmentType<typeof ProductInfo>))),
+        cartId ? client
+            .query(POPULAR_ITEMS, {amount: 5, cart: cartId})
+            .then(r => r.topProducts.map(p => useFragment(ProductInfo, p as FragmentType<typeof ProductInfo>)))
+            .catch(() => []): []
     ])
 
-    return { featured, top, favorites }
+    return { featured: [], top, favorites }
 }
 
 export default function Homepage() {
-    const {featured, top, favorites} = useLoaderData()
+    const {featured, top, favorites} = useLoaderData<typeof loader>()
     const shop = useShop()
     const { cart } = useContext(CartContext)
     const navigate = useNavigate()
@@ -62,14 +68,14 @@ export default function Homepage() {
                 <div className={"flex flex-col gap-4"}>
                     <h2 className={"text-customn-white-200 font-bold text-2xl"}>Your Favorites</h2>
                     <div className={"flex flex-row overflow-x-auto gap-4 items-center"}>
-                        {favorites.map((p: IProduct) => <ItemCard key={p.id} product={p}/>)}
+                        {favorites.map((p) => <ItemCard key={p.id} product={p as IProduct}/>)}
                     </div>
                 </div>
             }
             <div className={"flex flex-col gap-4"}>
                 <h2 className={"text-customn-white-200 font-bold text-2xl"}>Most Popular</h2>
                 <div className={"flex flex-row overflow-x-auto gap-4 items-center"}>
-                    {top.map((p: IProduct) => <ItemCard key={p.id} product={p}/>)}
+                    {top.map((p) => <ItemCard key={p.id} product={p as IProduct}/>)}
                 </div>
             </div>
         </div>

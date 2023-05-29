@@ -3,43 +3,6 @@ import {useContext, useEffect, useState} from "react";
 import { CartContext, ICartContext } from "../../context/CartContext";
 import { CartItem } from "./components/CartItem";
 import {ILoginContext, LoginContext} from "~/context/LoginContext";
-import { loadScript } from "@paypal/paypal-js";
-import {GraphQLClient, ICart, ICheckout, useClient} from "~/utils/graphql";
-import {useLocation} from "react-router";
-import useShop from "~/hooks/useShop";
-
-const PUBLIC_SECRET = 'pk_test_51MQe54ISFEwmK0SWhLN2ayXjeHQWFz2Lg1FEQg32UOHfQMCqxgfqu83CI46DXsSNk4UlbaZS2OKBplXGmJ8NzsQ400qSY1cGQy'
-const PAYPAL_CLIENT_ID = 'AVQgsOkIC75aGbI7KdsS02PjtMB63rO-rpK5Y_0TXrh-jsubuvb9fCcIT-KrDQrjp-5F30Qm6T8VeUTq'
-
-async function retrievePayPalOrder(shopId: string, cart: ICart, checkout: ICheckout) {
-    const { paypalId, paypalOrderId } = await fetch('http://api.agoramp.com/payments/orderinfo', {
-        method: "POST",
-        body: JSON.stringify({
-            checkoutId: checkout.id,
-            currency: cart.currency
-        }),
-        headers: {
-            "content-type": "application/json",
-            "X-Agora-Store-ID": shopId
-        }
-    }).then(r => r.json())
-    if (!paypalId || !paypalOrderId) return Promise.reject()
-    const script = await loadScript({
-        "client-id": PAYPAL_CLIENT_ID,
-        "merchant-id": paypalId,
-        "buyer-country": checkout.country,
-        currency: cart.currency,
-        "data-namespace": `paypal-${Math.random()}`
-    })
-
-    if (!script?.Buttons) return Promise.reject()
-
-    return script.Buttons({
-        createOrder: async () => paypalOrderId,
-        fundingSource: "paypal",
-        onApprove: async () => window.location.assign(`/checkout/success?id=${checkout.id}`)
-    })
-}
 
 export const Cart = () => {
     const {
@@ -48,39 +11,6 @@ export const Cart = () => {
         updateCartOpen
     } = useContext(CartContext) as ICartContext;
     const {setShowLogIn, showLogIn} = useContext(LoginContext) as ILoginContext
-    const client = useClient()
-    const [checkout, setCheckout] = useState<any>()
-    const [paypal, setPayPal] = useState<any>()
-    const shop = useShop()
-
-    useEffect(() => {
-        if (!cart) {
-            setCheckout(undefined)
-        } else {
-            client.createCheckout(cart.id, 'auto', 'auto', window.location.href)
-                .then(setCheckout)
-                .catch(() => setCheckout(undefined));
-        }
-    }, [cart])
-    useEffect(() => {
-        if (!checkout || !cart) {
-            setPayPal(undefined)
-            return
-        }
-        try {
-            retrievePayPalOrder(shop.id, cart, checkout)
-                .then(setPayPal)
-                .catch(r => setPayPal(undefined))
-        } catch (e) {
-            console.error(e)
-        }
-    }, [checkout])
-    useEffect(() => {
-        if (!paypal) return
-        const e = document.getElementById("paypal-button")
-        if (e) e.innerHTML = ""
-        paypal?.render("#paypal-button")
-    }, [paypal])
 
     if (cartOpen && !cart) {
         // they want to log in
@@ -125,9 +55,9 @@ export const Cart = () => {
                             <div className={"flex flex-col gap-2"}>
                                 <h2 className="font-black text-white">Total: {cart.cost.actual}</h2>
                             </div>
-                            {checkout && <a target={"_blank"}
+                            {cart && <a target={"_blank"}
                                             className={"rounded-md bg-white border border-black h-10 flex justify-center items-center"}
-                                            href={`/checkout?id=${checkout.id}`}>Secure Checkout</a>}
+                                            href={`/checkout?id=${cart.id}`}>Secure Checkout</a>}
                             <div id={"paypal-button"}/>
                         </div>
                     </div>

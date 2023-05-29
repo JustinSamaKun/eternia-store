@@ -3,7 +3,6 @@ import { CartIcon } from '../CartIcon';
 import { CartContext, ICartContext } from "../../context/CartContext";
 import { Link } from 'react-router-dom';
 import { ISearchContext, SearchContext } from '../../context/SearchContext';
-import {ICategory} from "~/utils/graphql";
 import useShop from "~/hooks/useShop";
 import {ILoginContext, LoginContext} from "~/context/LoginContext";
 
@@ -19,7 +18,7 @@ export const Navigation = () => {
     }
 
     const handleCartClick = () => {
-        if (cart === null) {
+        if (!cart) {
             setShowLogIn(true);
             return;
         }
@@ -30,15 +29,19 @@ export const Navigation = () => {
         <div>
             <header className="py-3 flex flex-row justify-between items-center text-white">
                 <Link x-comp="NavLink" aria-label="Remix" aria-current="page" className="active" to="/">
-                    <img
-                        className="object-contain fadeIn invisible md:visible h-20 w-48"
-                        src={shop?.branding?.logo}
-                        alt="logo"
-                    />
+                    {shop.branding?.logo ? (
+                        <img
+                            className="object-contain fadeIn invisible md:visible h-20 w-48"
+                            src={shop.branding?.logo}
+                            alt={shop.title}
+                        />
+                    ) : (
+                        <div>{shop.title}</div>
+                    )}
                 </Link>
                 <div className="flex fadeIn" aria-label="Main">
                     <Link x-comp="HeaderLink" to={"/"} className="text-d-p-sm mx-2 sm:mx-4 text-[16px] md:text-lg last:mr-0 hover:opacity-100 font-bold text-custom-gray-600 hover:text-custom-gray-200 hover:cursor-pointer">Home</Link>
-                    {shop?.categories?.sort((a, b) => a.order > b.order ? 1 : -1).map((category: ICategory) => {
+                    {shop.categories.sort((a, b) => a.order > b.order ? 1 : -1).map((category) => {
                         return (
                             <a key={category.id} x-comp="HeaderLink" href={`/category/${category.handle}`} className="text-d-p-sm mx-2 sm:mx-4 text-[16px] md:text-lg last:mr-0 text-custom-gray-600 hover:text-custom-gray-200 font-bold hover:cursor-pointer">{category.title}</a>
                         )
@@ -54,7 +57,7 @@ export const Navigation = () => {
                         <CartIcon />
                     </a>
                     {
-                        cart === null ?
+                        !cart ?
                             <button x-comp="PrimaryButtonLink" onClick={() => setShowLogIn(true)} className="button-background inline-flex items-center cursor-pointer justify-center h-11 box-border rounded-full focus:outline-none font-black text-white-500 hover:bg-opacity-100 hover:text-custom-white-500 focus:bg-opacity-100 focus:text-custom-white-500 w-[90px] md:w-[118px] transition-colors duration-200 xl:order-1">Login</button>
                             : <button x-comp="PrimaryButtonLink" onClick={() => handleLogout()} className="button-background inline-flex items-center cursor-pointer justify-center h-11 box-border rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent font-black text-white-500 hover:bg-opacity-100 hover:text-custom-white-500 focus:bg-opacity-100 focus:text-custom-white-500 w-[90px] md:w-[118px] transition-colors duration-200 xl:order-1">Logout</button>
                     }

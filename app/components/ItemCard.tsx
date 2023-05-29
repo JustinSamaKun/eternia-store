@@ -1,7 +1,6 @@
 import { useState } from "react";
-import {IProduct} from "~/utils/graphql";
 import {AddToCart} from "~/components/AddToCart";
-import {ItemDetails} from "~/components/ItemDetails";
+import {IProduct} from "~/graphql/shop";
 
 function ruleOf100(price: IProduct['price']) {
     let digits = price.price.includes('.') ? price.price.length - (price.price.indexOf('.') + 1) : 0
@@ -29,7 +28,7 @@ export const ItemCard = ({ product }: { product: IProduct }) => {
             {price.listPrice !== price.price && <div className={"absolute top-0 left-0 m-2 px-4 bg-custom-gray-200 rounded-sm text-black"}>{ruleOf100(price)} Off</div>}
             <img
                 className="object-contain max-w-full my-auto"
-                src={image}
+                src={image ?? "https://cdn.agoramp.com/static/209/assets/blank_product.png"}
                 alt={title}
             />
             <div className={"flex flex-col gap-2 mt-auto"}>

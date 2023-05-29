@@ -4,13 +4,14 @@ import { SnackBarContext, ISnackBarMessage, ISnackBarContext } from '~/context/S
 import {Links, Meta, Outlet, Scripts, useLoaderData} from "@remix-run/react";
 import React, {useContext, useState} from "react";
 import {getCartId, getStoreId} from "~/utils/requests.server";
-import {ICategory, useClient} from "~/utils/graphql";
-import {json} from "@remix-run/node";
-import {Modal} from "~/components/Modal";
+import {useClient} from "~/utils/graphql";
 import CartProvider from "~/context/CartContext";
 import {ShopProvider} from "~/context/ShopContext";
 import SearchProvider from "~/context/SearchContext";
 import LoginProvider from "~/context/LoginContext";
+import {SHOP_QUERY} from "~/graphql/shop";
+import {CART_QUERY, CartInfo} from "~/graphql/cart";
+import {FragmentType, useFragment} from "~/graphql/generated";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const cartId = getCartId(request)
@@ -18,11 +19,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
         const client = useClient(request)
 
         const [shop, cart] = await Promise.all([
-            client.fetchShop(),
-            cartId ? client.fetchCart(cartId) : null
+            client.query(SHOP_QUERY),
+            cartId ? client.query(CART_QUERY, { cart: cartId }).catch(e => null) : null
         ])
 
-        return { shop, cart }
+        return { shop: shop?.shop, cart: cart?.cart }
     } catch (e) {
         console.error(cartId, getStoreId(request), e)
         throw e
@@ -30,12 +31,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function __layout() {
-    const {shop, cart} = useLoaderData()
+    const { shop, cart } = useLoaderData<typeof loader>()
     const {snackBar} = useContext(SnackBarContext) as ISnackBarContext;
+
+    const cartInfo = useFragment(CartInfo, cart as FragmentType<typeof CartInfo>)
 
     return (
         <div className="App bg-theme-color-500 h-100 w-100">
-            <CartProvider initialCart={cart}>
+            <CartProvider initialCart={cartInfo}>
                 <ShopProvider shop={shop}>
                     <SearchProvider>
                         <LoginProvider>
@@ -51,7 +54,7 @@ export default function __layout() {
                                             <div className={"flex flex-row justify-between items-center"}>
                                                 <img className={"w-16 aspect-square"} src={"/favicon.ico"} />
                                                 <div className={"flex flex-row gap-4"}>
-                                                    {shop.categories.map((c: ICategory) => (
+                                                    {shop.categories.map((c) => (
                                                         <a key={c.id} href={`/category/${c.handle}`}>{c.title}</a>
                                                     ))}
                                                 </div>

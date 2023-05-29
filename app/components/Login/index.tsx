@@ -1,12 +1,12 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { CartContext, ICartContext } from "../../context/CartContext";
-import { useMutation } from "urql";
 
 import { LoginContext, ILoginContext } from "../../context/LoginContext";
 import {useClient} from "~/utils/graphql";
+import {CART_CREATE, USER_QUERY} from "~/graphql/cart";
 
 export const Login = () => {
-    const { cartID, cart, updateCart } = useContext(CartContext) as ICartContext;
+    const { cartID, updateCart } = useContext(CartContext) as ICartContext;
     const { showLogIn, setShowLogIn } = useContext(LoginContext) as ILoginContext;
     const client = useClient()
 
@@ -21,17 +21,19 @@ export const Login = () => {
         }
         setLoading(true);
 
-        client.fetchUser(input).then(user => {
-            if (!user) {
-                setLoginError("Please enter a valid username.");
-                return;
-            }
-            const {name, id} = user
-            client.createCart(name, id)
-                .then(c => updateCart(c))
-                .then(() => setShowLogIn(false))
-                .finally(() => setLoading(false))
-        });
+        client.query(USER_QUERY, {user: input})
+            .then(r => r.user)
+            .then(user => {
+                if (!user) {
+                    setLoginError("Please enter a valid username.");
+                    return;
+                }
+                const {name, id} = user
+                client.mutation(CART_CREATE, {ign: name, uuid: id})
+                    .then(c => updateCart(c.cartCreate))
+                    .then(() => setShowLogIn(false))
+                    .finally(() => setLoading(false))
+            });
     };
 
     if (!showLogIn) return <></>

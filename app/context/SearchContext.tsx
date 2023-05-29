@@ -1,5 +1,5 @@
 import React from "react";
-import {IProduct} from "~/utils/graphql";
+import {IProduct} from "~/graphql/shop";
 
 export interface ISearchContext {
     items: Set<IProduct>;

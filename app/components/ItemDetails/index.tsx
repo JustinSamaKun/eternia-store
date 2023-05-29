@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from "react";
 
 import { AddToCart } from "../AddToCart";
-import {ProductQueryResult, useClient} from "~/utils/graphql";
+import {useClient} from "~/utils/graphql";
 import {Modal} from "~/components/Modal";
+import {PRODUCT_QUERY} from "~/graphql/shop";
+import {ProductQuery} from "~/graphql/generated/graphql";
 
 interface IItemDetailsProps {
     handle: string;
@@ -15,12 +17,12 @@ export const ItemDetails = (props: IItemDetailsProps) => {
     const { handle, viewDetails, setViewDetails, productId } = props;
 
     const client = useClient()
-    const [details, setDetails] = useState<ProductQueryResult>()
+    const [details, setDetails] = useState<ProductQuery>()
     const [fetching, setFetching] = useState(false)
 
     useEffect(() => {
         setFetching(true)
-        client.fetchProductByHandle(handle)
+        client.query(PRODUCT_QUERY, { product: handle })
             .then(p => setDetails(p))
             .finally(() => setFetching(false))
     }, [])
@@ -33,7 +35,7 @@ export const ItemDetails = (props: IItemDetailsProps) => {
             >
                 <section className="relative w-full h-full mx-auto max-w-2xl flex justify-center items-center">
                     <div className="relative bg-theme-color-500 rounded-2xl drop-shadow-xl border-l-8 border-8 border-custom-gray-600">
-                    { !fetching && details !== undefined ?
+                    { !fetching && details?.productByHandle && details.recommendedProducts ?
                       <>
                         <div>
                             <div className="flex items-start justify-between p-4">
@@ -55,11 +57,11 @@ export const ItemDetails = (props: IItemDetailsProps) => {
                             <>
                                 <div className="h-3" />
                                 <div className="p-5 rounded-2xl bg-card-background-500 border border-custom-purple-500 flex flex-row">
-                                    <img
+                                    {item.image && <img
                                         className="object-contain h-5 w-5"
                                         src={item.image}
                                         alt={item.title}
-                                    />
+                                    />}
                                     <h2 className="pl-3 font-bold">{item.title}</h2>
                                     <h2 className="pl-3 font-bold">{item.price.listPrice}</h2>
                                     <button className="button-hover text-custom-gray-100 button-background focus:outline-none focus:ring-4 font-black rounded-full text-sm px-3 py-1.5 text-center mr-2 mb-2">Go To</button>
