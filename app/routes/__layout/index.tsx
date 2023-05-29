@@ -1,6 +1,6 @@
-import {Cart, Search, Slider} from "~/components";
-import React, {useContext, useEffect, useRef, useState} from "react";
-import {Links, Meta, Scripts, useLoaderData, useNavigate} from "@remix-run/react";
+import {Slider} from "~/components";
+import React, {useContext, useEffect, useRef} from "react";
+import {useLoaderData, useNavigate} from "@remix-run/react";
 import {LoaderFunctionArgs} from "@remix-run/router";
 import {IProduct, useClient} from "~/utils/graphql";
 import useShop from "~/hooks/useShop";

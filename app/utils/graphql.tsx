@@ -12,14 +12,11 @@ import {getStoreId} from "~/utils/requests.server";
 import useShop from "~/hooks/useShop";
 
 export function useClient(request?: Request) {
-    let store: string, url: string;
+    let store: string, url = 'https://api.agoramp.com/graphql';
     if (request) {
         store = getStoreId(request)
-        url = 'http://agora-api-service.default.svc.cluster.local/graphql';
     } else {
-        const shop = useShop();
-        store = shop.id;
-        url = 'http://api.agoramp.com/graphql';
+        store = useShop().id;
     }
 
     return new GraphQLClient(createClient({
