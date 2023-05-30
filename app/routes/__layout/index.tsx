@@ -1,5 +1,5 @@
 import {Slider} from "~/components";
-import React, {useContext, useEffect, useRef} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {useLoaderData, useNavigate} from "@remix-run/react";
 import {LoaderFunctionArgs} from "@remix-run/router";
 import {useClient} from "~/utils/graphql";
@@ -8,8 +8,9 @@ import {Link} from "react-router-dom";
 import {ItemCard} from "~/components/ItemCard";
 import {getCartId} from "~/utils/requests.server";
 import {CartContext} from "~/context/CartContext";
-import {IProduct, POPULAR_ITEMS, ProductInfo} from "~/graphql/shop";
+import {IProduct, POPULAR_ITEMS, ProductInfo, SLIDESHOW_PRODUCT_QUERY} from "~/graphql/shop";
 import {FragmentType, useFragment} from "~/graphql/generated";
+import {SlideshowProductQuery} from "~/graphql/generated/graphql";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const client = useClient(request)
@@ -25,15 +26,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
             .catch(() => []): []
     ])
 
-    return { featured: [], top, favorites }
+    return { top, favorites }
 }
 
 export default function Homepage() {
-    const {featured, top, favorites} = useLoaderData<typeof loader>()
+    const {top, favorites} = useLoaderData<typeof loader>()
     const shop = useShop()
+    const client = useClient()
     const { cart } = useContext(CartContext)
     const navigate = useNavigate()
     const count = useRef(0)
+    const [featured, setFeatured] = useState<Required<SlideshowProductQuery['productByID'][]>>([])
 
     useEffect(() => {
         if (count.current < 2) {
@@ -42,6 +45,22 @@ export default function Homepage() {
         }
         navigate('.', { replace: true })
     }, [cart?.identity.uuid])
+
+    useEffect(() => {
+        const slideshow = shop.theme.slideshow
+        if (slideshow) {
+            console.log(slideshow.split(','))
+            Promise
+                .all(
+                    slideshow
+                        .split(',')
+                        .filter(s => s.length > 0)
+                        .map(id => client.query(SLIDESHOW_PRODUCT_QUERY, { product: id }).then(r => r.productByID))
+                )
+                .then(r => setFeatured(r.filter(p => p).map(p => p!)))
+
+        }
+    }, [shop.theme.slideshow])
 
     const categories = shop.categories
         .flatMap(c => c.subcategories.length > 0 ? c.subcategories : [c])

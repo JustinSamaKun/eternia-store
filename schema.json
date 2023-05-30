@@ -1,0 +1,16 @@
+{
+  "author": "Agora",
+  "config": [
+    {
+      "header": "Global Settings",
+      "options": [
+        {
+          "id": "slideshow",
+          "name": "Slideshow Products",
+          "description": "Choose which products get displayed on the homepage slideshow.",
+          "type": "products"
+        }
+      ]
+    }
+  ]
+}

@@ -15,15 +15,16 @@ import {FragmentType, useFragment} from "~/graphql/generated";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const cartId = getCartId(request)
+    const theme = new URL(request.url).searchParams.get('theme') ?? process.env.THEME_ID
     try {
         const client = useClient(request)
 
         const [shop, cart] = await Promise.all([
-            client.query(SHOP_QUERY),
-            cartId ? client.query(CART_QUERY, { cart: cartId }).catch(e => null) : null
+            client.query(SHOP_QUERY, { theme }).then(r => r.shop),
+            cartId ? client.query(CART_QUERY, { cart: cartId }).then(r => r.cart).catch(e => null) : null
         ])
 
-        return { shop: shop?.shop, cart: cart?.cart }
+        return { shop, cart }
     } catch (e) {
         console.error(cartId, getStoreId(request), e)
         throw e

@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect, useCallback} from "react";
 import { Feature } from "./components/Feature";
+import {SlideshowProductQuery} from "~/graphql/generated/graphql";
 
 
-export const Slider = ({ featured }: { featured: any[] }) => {
-
+export const Slider = ({ featured }: { featured: Required<SlideshowProductQuery['productByID'][]> }) => {
     const [page, setPage] = useState<number>(0);
     const [timer, setTimer] = useState<NodeJS.Timeout>();
     const [isHovered, setIsHovered] = useState<boolean>(false);
 
+    const handlePageChange = useCallback((page: number) => setPage((page + featured.length) % featured.length), [featured]);
+
     useEffect(() => {
+        if (featured.length === 0) return
         if (timer) clearTimeout(timer);
 
         setTimer(setTimeout(() => handlePageChange(page + 1), 5000));
@@ -16,8 +19,9 @@ export const Slider = ({ featured }: { featured: any[] }) => {
         return () => {
             clearTimeout(timer);
         }
-    }, [page]);
-    const handlePageChange = (page: number) => setPage((page + featured.length) % featured.length);
+    }, [page, handlePageChange, featured]);
+
+    if (featured.length === 0) return <></>
 
     return (
         <section className="slideshow">

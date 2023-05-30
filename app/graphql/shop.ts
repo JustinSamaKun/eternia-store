@@ -16,16 +16,13 @@ fragment ProductInfo on Product {
 
 export type IProduct = ProductInfoFragment
 export const SHOP_QUERY = graphql(`
-query Shop {
+query Shop($theme: String) {
     shop {
         id
         title
         description
-        theme {
-            variables {
-                key
-                value
-            }
+        theme(theme: $theme) {
+            slideshow: variable(key: "slideshow")
         }
         branding {
             logo
@@ -68,6 +65,20 @@ export const PRODUCT_QUERY = graphql(`
         }
         recommendedProducts(handle: $product) {
             title
+            price {
+                price
+                listPrice
+            }
+            image
+        }
+    }
+`)
+
+export const SLIDESHOW_PRODUCT_QUERY = graphql(`
+    query SlideshowProduct($product: ID!) {
+        productByID(id: $product) {
+            title
+            description
             price {
                 price
                 listPrice
