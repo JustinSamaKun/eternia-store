@@ -1,12 +1,12 @@
 import {LoaderFunctionArgs} from "@remix-run/router";
-import {useClient} from "~/utils/graphql";
+import {useClient,getClient} from "~/utils/graphql";
 import {redirect} from "@remix-run/node";
 import {useLoaderData} from "@remix-run/react";
 import useShop from "~/hooks/useShop";
 import {PRODUCT_QUERY} from "~/graphql/shop";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    const client = useClient(request)
+    const client = getClient(request)
 
     const handle = params.productid
 

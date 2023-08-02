@@ -9,14 +9,28 @@ import {
 } from "urql";
 import {getStoreId} from "~/utils/requests.server";
 import useShop from "~/hooks/useShop";
+import {TypedDocumentNode} from "@graphql-typed-document-node/core";
+import {FragmentType, useFragment} from "~/graphql/generated";
 
-export function useClient(request?: Request) {
-    let store: string, url = 'https://api.agoramp.com/graphql';
-    if (request) {
-        store = getStoreId(request)
-    } else {
-        store = useShop().id;
-    }
+export function asFragment<T>(object: { ' $fragmentRefs'?: object }, type: TypedDocumentNode<T, unknown>): T {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    return useFragment(type, object as FragmentType<typeof type>)
+}
+
+export function useClient() {
+    let url = 'https://api.agoramp.com/graphql';
+    let store = useShop().id;
+
+    return new GraphQLClient(createClient({
+        url,
+        requestPolicy: 'network-only',
+        exchanges: [fetchExchange]
+    }), store)
+}
+
+export function getClient(request: Request) {
+    let url = 'https://api.agoramp.com/graphql';
+    let store = getStoreId(request)
 
     return new GraphQLClient(createClient({
         url,

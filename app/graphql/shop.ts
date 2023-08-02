@@ -7,16 +7,29 @@ fragment ProductInfo on Product {
     handle
     title
     image
-    price {
+    price(cartId: $cart) {
         price
         listPrice
     }
 }
 `)
 
+export const CategoryInfo = graphql(`
+fragment CategoryInfo on Category {
+    id
+    title
+    handle
+    order
+    image
+    firstProduct: products(amount: 1) {
+        ...ProductInfo
+    }
+}
+`)
+
 export type IProduct = ProductInfoFragment
 export const SHOP_QUERY = graphql(`
-query Shop($theme: String) {
+query Shop($theme: String, $cart: ID) {
     shop {
         id
         title
@@ -29,35 +42,39 @@ query Shop($theme: String) {
             icon
         }
         categories {
-            id
-            title
-            handle
-            order
+            ...CategoryInfo
             subcategories {
-                id
-                title
-                handle
-                order
+                ...CategoryInfo
             }
+        }
+    }
+}
+`)
+export const SLIDESHOW_QUERY = graphql(`
+query Slideshow($theme: String) {
+    shop {
+        theme(theme: $theme) {
+            slideshow: variable(key: "slideshow")
         }
     }
 }
 `)
 
 export const POPULAR_ITEMS = graphql(`
-    query TopProducts($amount: Int, $user: String, $cart: ID) {
-        topProducts(amount: $amount, user: $user, cart: $cart) {
+    query TopProducts($amount: Int, $user: String, $cartId: ID, $cart: ID) {
+        topProducts(amount: $amount, user: $user, cart: $cartId) {
             ...ProductInfo
         }
     }
 `)
 
 export const PRODUCT_QUERY = graphql(`
-    query Product($product: String!) {
+    query Product($product: String!, $cart: ID) {
         productByHandle(handle: $product) {
             title
             description
-            price {
+    restricted(cartId: $cart)
+            price(cartId: $cart) {
                 price
                 listPrice
             }
@@ -65,7 +82,7 @@ export const PRODUCT_QUERY = graphql(`
         }
         recommendedProducts(handle: $product) {
             title
-            price {
+            price(cartId: $cart) {
                 price
                 listPrice
             }
@@ -75,11 +92,11 @@ export const PRODUCT_QUERY = graphql(`
 `)
 
 export const SLIDESHOW_PRODUCT_QUERY = graphql(`
-    query SlideshowProduct($product: ID!) {
+    query SlideshowProduct($product: ID!, $cart: ID) {
         productByID(id: $product) {
             title
             description
-            price {
+            price(cartId: $cart) {
                 price
                 listPrice
             }
@@ -88,23 +105,8 @@ export const SLIDESHOW_PRODUCT_QUERY = graphql(`
     }
 `)
 
-export const CATEGORIES_QUERY = graphql(`
-    query Navigation {
-        categories {
-            handle
-            title
-            description
-            subcategories {
-                handle
-                title
-                description
-            }
-        }
-    }
-`)
-
 export const CATEGORY_QUERY = graphql(`
-    query Category($category: String!) {
+    query Category($category: String!, $cart: ID) {
         categoryByHandle(handle: $category) {
             handle
             title

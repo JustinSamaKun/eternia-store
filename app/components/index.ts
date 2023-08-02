@@ -1,4 +1,3 @@
-export { Navigation } from './Navigation';
 export { Slider } from './Slider';
 export { Login } from './Login';
 export { CartIcon } from './CartIcon';

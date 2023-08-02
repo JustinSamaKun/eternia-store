@@ -1,10 +1,12 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { CartIcon } from '../CartIcon';
-import { CartContext, ICartContext } from "../../context/CartContext";
+import { CartIcon } from '~/components/CartIcon';
+import { CartContext, ICartContext } from "~/context/CartContext";
 import { Link } from 'react-router-dom';
-import { ISearchContext, SearchContext } from '../../context/SearchContext';
+import { ISearchContext, SearchContext } from '~/context/SearchContext';
 import useShop from "~/hooks/useShop";
 import {ILoginContext, LoginContext} from "~/context/LoginContext";
+import {useLocation} from "@remix-run/react";
+import HeaderLink from "~/components/Header/Navigation/HeaderLink";
 
 export const Navigation = () => {
     const shop = useShop()
@@ -28,7 +30,7 @@ export const Navigation = () => {
     return (
         <div>
             <header className="py-3 flex flex-row justify-between items-center text-white">
-                <Link x-comp="NavLink" aria-label="Remix" aria-current="page" className="active" to="/">
+                <Link x-comp="NavLink" aria-label="Remix" aria-current="page" to="/">
                     {shop.branding?.logo ? (
                         <img
                             className="object-contain fadeIn invisible md:visible h-20 w-48"
@@ -39,11 +41,16 @@ export const Navigation = () => {
                         <div>{shop.title}</div>
                     )}
                 </Link>
-                <div className="flex fadeIn" aria-label="Main">
-                    <Link x-comp="HeaderLink" to={"/"} className="text-d-p-sm mx-2 sm:mx-4 text-[16px] md:text-lg last:mr-0 hover:opacity-100 font-bold text-custom-gray-600 hover:text-custom-gray-200 hover:cursor-pointer">Home</Link>
+                <div className="flex flex-row items-center gap-8" aria-label="Main">
+                    <HeaderLink to={"/"}>Home</HeaderLink>
                     {shop.categories.sort((a, b) => a.order > b.order ? 1 : -1).map((category) => {
                         return (
-                            <a key={category.id} x-comp="HeaderLink" href={`/category/${category.handle}`} className="text-d-p-sm mx-2 sm:mx-4 text-[16px] md:text-lg last:mr-0 text-custom-gray-600 hover:text-custom-gray-200 font-bold hover:cursor-pointer">{category.title}</a>
+                            <HeaderLink
+                                key={category.id}
+                                to={`/category/${category.handle}`}
+                            >
+                                {category.title}
+                            </HeaderLink>
                         )
                     })}
                 </div>
@@ -58,8 +65,8 @@ export const Navigation = () => {
                     </a>
                     {
                         !cart ?
-                            <button x-comp="PrimaryButtonLink" onClick={() => setShowLogIn(true)} className="button-background inline-flex items-center cursor-pointer justify-center h-11 box-border rounded-full focus:outline-none font-black text-white-500 hover:bg-opacity-100 hover:text-custom-white-500 focus:bg-opacity-100 focus:text-custom-white-500 w-[90px] md:w-[118px] transition-colors duration-200 xl:order-1">Login</button>
-                            : <button x-comp="PrimaryButtonLink" onClick={() => handleLogout()} className="button-background inline-flex items-center cursor-pointer justify-center h-11 box-border rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent font-black text-white-500 hover:bg-opacity-100 hover:text-custom-white-500 focus:bg-opacity-100 focus:text-custom-white-500 w-[90px] md:w-[118px] transition-colors duration-200 xl:order-1">Logout</button>
+                            <button x-comp="PrimaryButtonLink" onClick={() => setShowLogIn(true)} className="button rounded-full px-8 py-2">Login</button>
+                            : <button x-comp="PrimaryButtonLink" onClick={() => handleLogout()} className="button rounded-full px-8 py-2">Logout</button>
                     }
                 </div>
             </header>

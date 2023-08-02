@@ -1,15 +1,15 @@
 import {LoaderFunctionArgs} from "@remix-run/router";
-import {Alert, Cart, Login, Navigation, Search} from '~/components';
+import {Alert, Cart, Login, Search} from '~/components';
 import { SnackBarContext, ISnackBarMessage, ISnackBarContext } from '~/context/SnackBar';
 import {Links, Meta, Outlet, Scripts, useLoaderData} from "@remix-run/react";
 import React, {useContext, useState} from "react";
 import {getCartId, getStoreId} from "~/utils/requests.server";
-import {useClient} from "~/utils/graphql";
+import {useClient, getClient, asFragment} from "~/utils/graphql";
 import CartProvider from "~/context/CartContext";
 import {ShopProvider} from "~/context/ShopContext";
 import SearchProvider from "~/context/SearchContext";
 import LoginProvider from "~/context/LoginContext";
-import {SHOP_QUERY} from "~/graphql/shop";
+import {CategoryInfo, SHOP_QUERY} from "~/graphql/shop";
 import {CART_QUERY, CartInfo} from "~/graphql/cart";
 import {FragmentType, useFragment} from "~/graphql/generated";
 
@@ -17,10 +17,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const cartId = getCartId(request)
     const theme = new URL(request.url).searchParams.get('theme') ?? process.env.THEME_ID
     try {
-        const client = useClient(request)
+        const client = getClient(request)
 
         const [shop, cart] = await Promise.all([
-            client.query(SHOP_QUERY, { theme }).then(r => r.shop),
+            client.query(SHOP_QUERY, { theme, cart: undefined }).then(r => r.shop),
             cartId ? client.query(CART_QUERY, { cart: cartId }).then(r => r.cart).catch(e => null) : null
         ])
 
@@ -38,24 +38,21 @@ export default function __layout() {
     const cartInfo = useFragment(CartInfo, cart as FragmentType<typeof CartInfo>)
 
     return (
-        <div className="App bg-theme-color-500 h-100 w-100">
+        <div className="App relative">
             <CartProvider initialCart={cartInfo}>
                 <ShopProvider shop={shop}>
                     <SearchProvider>
                         <LoginProvider>
                             <div className={"flex flex-col min-h-screen gap-8"}>
-                                <div className="relative mx-auto px-8 min-w-[90rem] max-w-[90rem] flex flex-col">
-                                    <Navigation/>
-                                    <Search/>
-                                    <Outlet/>
-                                </div>
+                                <Outlet />
+                                <div className={"relative"}><Search /></div>
                                 <footer className={"text-white bg-gray-800 mt-auto"}>
                                     <div className={"border-t border-b border-gray-500 py-4"}>
                                         <div className="max-w-[90rem] flex flex-col justify-center mx-auto">
                                             <div className={"flex flex-row justify-between items-center"}>
                                                 <img className={"w-16 aspect-square"} src={"/favicon.ico"} />
                                                 <div className={"flex flex-row gap-4"}>
-                                                    {shop.categories.map((c) => (
+                                                    {shop.categories.map(c => asFragment(c, CategoryInfo)).map((c) => (
                                                         <a key={c.id} href={`/category/${c.handle}`}>{c.title}</a>
                                                     ))}
                                                 </div>

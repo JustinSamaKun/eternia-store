@@ -24,32 +24,31 @@ export const Slider = ({ featured }: { featured: Required<SlideshowProductQuery[
     if (featured.length === 0) return <></>
 
     return (
-        <section className="slideshow">
-            {featured.map((feature, i: number) => {
+        <section className="flex flex-col justify-center h-[32rem]">
+            <div className={"flex flex-row justify-between items-center"}>
+                <button className="z-30 button rounded-full aspect-square text-white p-2" onClick={() => handlePageChange(page - 1)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="white" className="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"/>
+                    </svg>
+                </button>
+                <button className="z-30 button rounded-full aspect-square text-white p-2" onClick={() => handlePageChange(page + 1)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="white" className="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"/>
+                    </svg>
+                </button>
+            </div>
+            <div style={{translate: `-${page * 100}vw`}} className={"absolute left-0 flex flex-row transition-all"}>
+                {featured.map((feature, i: number) => {
                     return (
-                        <div key={i} className={"content w-full" + (i < page ? " before" : i > page ? " after" : "")}>
+                        <div key={i} className={"w-[100vw]"}>
                             <Feature
                                 {...feature}
                             />
                         </div>
                     )
-            })}
-            <div className="buttons flex flex-row">
-                <button className="mr-3" onClick={() => handlePageChange(page - 1)}>
-                    <svg onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={isHovered ? "#F0F0F0" : "#E0E8FE"}  className="w-10 h-10">
-                        <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-4.28 9.22a.75.75 0 000 1.06l3 3a.75.75 0 101.06-1.06l-1.72-1.72h5.69a.75.75 0 000-1.5h-5.69l1.72-1.72a.75.75 0 00-1.06-1.06l-3 3z" clipRule="evenodd" />
-                    </svg>
-                </button>
-                <div className="flex flex-row justify-center items-center">
-                    {featured.map((feature, i: number) => (
-                        <div key={i} className={`${page === i ? "bg-custom-gray-200" : "bg-custom-gray-700"} ml-1 mr-1 rounded-full w-1 h-1`}/>
-                    ))}
-                </div>
-                <button className="ml-3" onClick={() => handlePageChange(page + 1)}>
-                    <svg onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={isHovered ? "#F0F0F0" : "#E0E8FE"} className="w-10 h-10">
-                        <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z" clipRule="evenodd" />
-                    </svg>
-                </button>
+                })}
             </div>
         </section>
     )

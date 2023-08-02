@@ -39,19 +39,23 @@ export const Login = () => {
     if (!showLogIn) return <></>
 
     return (
-        <section className={"fixed top-0 right-0 left-0 bottom-0 flex justify-center items-center "}>
-            <div className={"w-[40rem] min-h-[10rem] z-40 p-14 rounded-lg border border-gray-500 bg-gray-800 text-white flex flex-col gap-4 justify-center"}>
-                <h1 className={"font-medium text-xl"}>Please login to continue</h1>
-                <div className={"flex flex-row gap-2 items-center"}>
-                    <input
-                        className="rounded-sm px-2 py-1 text-black"
-                        placeholder="Enter your username"
-                        onChange={(e) => setInput(e.target.value)}
-                    />
-                    <button disabled={loading} className="rounded-sm px-8 py-1 bg-agora-300 text-agora-500" onClick={() => handleLogin()}>{loading ? "Loading..." : "Login"}</button>
+        <>
+            <div className={"z-40 absolute inset-0 backdrop-blur-lg bg-gray-200 opacity-10"} onClick={() => setShowLogIn(false)}/>
+            <section className={"z-40 fixed inset-0 w-1/3 ml-auto overflow-auto overflow-hidden transition-all"}>
+                <div className={"h-full flex ml-auto bg-card-background-500 drop-shadow-xl border-l border-l-gray-500"}>
+                    <div className={"p-8 flex flex-col flex-1 gap-4"}>
+                        <h1 className={"font-medium text-xl text-white"}>Please login to continue</h1>
+                        <div className={"flex flex-row gap-2 items-center"}>
+                            <input
+                                className="rounded-sm px-2 py-1 text-black"
+                                placeholder="Enter your username"
+                                onChange={(e) => setInput(e.target.value)}
+                            />
+                            <button disabled={loading} className="rounded-sm px-8 py-1 bg-agora-300 text-agora-500" onClick={() => handleLogin()}>{loading ? "Loading..." : "Login"}</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div className={"absolute inset-0 backdrop-blur-lg bg-gray-200 opacity-10"} onClick={() => setShowLogIn(false)}/>
-        </section>
+            </section>
+        </>
     )
 }
